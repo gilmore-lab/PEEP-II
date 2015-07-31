@@ -1,0 +1,10 @@
+make_peep_order_fr_xlsx <- function(fn, order, run) {
+  require(xlsx)
+  m <- read.xlsx(fn, sheetIndex=1, header = FALSE)
+  df <- data.frame(t(m)[2:dim(m)[2],])
+  names(df) <- c("Speaker", "Emotion", "Script")
+  df$Order <- order
+  df$Run <- run
+  df$Stim_index <- 1:dim(df)[1]
+  df
+}

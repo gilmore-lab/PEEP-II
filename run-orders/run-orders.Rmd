@@ -1,0 +1,153 @@
+---
+title: "PEEP-II-Script-Orders"
+author: "rogilmore"
+date: "`r Sys.time()`"
+output: html_document
+---
+
+There are four orders, with two runs in each. Sequences should start and end with a neutral prosody. 
+
+```{r set-up}
+# Source libraries
+library(ggplot2)
+library(dplyr)
+
+# Define paths
+dir_xlsx <- 'xlsx'
+dir_csv <- 'csv'
+dir_figs <- 'figs'
+
+# Source external functions
+source(paste('make_peep_order_fr_xlsx.R', sep="/"))
+```
+
+```{r load-data}
+# Function loads .csv and turns into a data frame
+
+# Should do list-wise, but faster to do this
+o1r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o1r1.xlsx', sep="/"), 1, 1)
+o1r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o1r2.xlsx', sep="/"), 1, 2)
+o2r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o2r1.xlsx', sep="/"), 2, 1)
+o2r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o2r2.xlsx', sep="/"), 2, 2)
+o3r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o3r1.xlsx', sep="/"), 3, 1)
+o3r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o3r2.xlsx', sep="/"), 3, 2)
+o4r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o4r1.xlsx', sep="/"), 4, 1)
+o4r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o4r2.xlsx', sep="/"), 4, 2)
+
+peep_orders <- rbind(o1r1, o1r2, o2r1, o2r2, o3r1, o3r2, o4r1, o4r2 )
+
+# Make Run, Order, Stim_index a factor
+peep_orders$Run = as.factor(peep_orders$Run)
+
+```
+
+Visualize orders
+
+```{r run-order-plot}
+library(ggplot2)
+
+p <- ggplot(peep_orders) +
+  aes(x=Stim_index, y=Emotion, color=Emotion) + 
+  geom_point()
+p
+```
+
+This seems to show that we need to normalize/recode the Happy, Angry, Neutral levels.
+
+```{r recode-levels}
+levels(peep_orders$Emotion)
+
+# Now rename to fix
+levels(peep_orders$Emotion) <- list(Angry = c("Angry", "Angry "), 
+                                    Happy = c("Happy", "Happy "),
+                                    Neutral = c("Neu", "Neut"),
+                                    Sad = c("Sad"),
+                                    Silence = c("Sil"))
+levels(peep_orders$Emotion)
+```
+
+Ok, so that's fixed. Let's replot by run and order.
+
+```{r run-orders-plot-v2}
+p <- ggplot(peep_orders) +
+  aes(x=Stim_index, y=Emotion, 
+      color=Emotion,
+      shape = Speaker) + 
+  geom_point() +
+  facet_grid(Order ~ Run)
+p
+```
+
+So, we need to decide which speaker and script works for the final neutral stimulus. It looks like we start with the unfamiliar speaker for all of the initial neutral prosodies, so should we end with Mom?
+
+Now, let's look at scripts.
+
+```{r}
+with(peep_orders, table(Emotion, Script, Speaker))
+```
+
+Looks like we only have the 1a-4a scripts assigned. Mom has too many angry 4a's and no Happy 4a's. The "" script will go away once we assign that last neutral stimulus. 
+
+Plot to see where the problem is?
+
+```{r}
+# Split Script and Script_version
+peep_orders$Script_version <- peep_orders$Script
+
+levels(peep_orders$Script_version) <- list(a = c("1a", "2a", "3a", "4a"),
+                                           b = c("1b", "2b", "3b", "4b"))
+
+levels(peep_orders$Script) <- list('1' = c("1a", "1b"), 
+                                   '2' = c("2a", "2b"),
+                                   '3' = c("3a", "3b"),
+                                   '4' = c("4a", "4b"),
+                                   '0' = c("None", "NA", ""))
+```
+
+Now, we can plot scripts.
+
+```{r run-orders-plot-by-script}
+p <- ggplot(peep_orders) +
+  aes(x=Stim_index, y=Emotion, 
+      color = Emotion,
+      shape = Script) + 
+  geom_point() +
+  facet_grid(Order ~ Run)
+p
+```
+
+By version.
+
+```{r run-orders-plot-by-version}
+p <- ggplot(peep_orders) +
+  aes(x=Stim_index, y=Emotion, 
+      color = Emotion,
+      shape = Script_version) + 
+  geom_point() +
+  facet_grid(Order ~ Run)
+p
+```
+
+Ok, so it looks like order 1 uses all a, order 2 all b, and orders 3 and 4 both a and b in the a, b order. 
+
+## Visualizing balance in design
+
+Do we have the same number of prosodies for each speaker within each of the four orders?
+
+```{r}
+# Here's a better way to visualize whether we are balanced by orders
+peep_filtered <- peep_orders %>%
+  filter(Emotion %in% c('Angry', 'Happy', 'Sad', 'Neutral'))
+
+xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.levels = TRUE)
+```
+
+No.
+
+Order 1: 1 too many Angry+Mom, one too few Happy+Mom. Neutrals ok. (added one each at end)
+
+Order 2: Looks ok.
+
+Order 3: One too many Angry, Happy, and Sad for Mom.
+
+Order 4: Looks ok.
