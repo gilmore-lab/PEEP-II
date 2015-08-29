@@ -1,0 +1,14 @@
+participant-id,run,order-id,t-onset,duration-s,stim-type,stim-name
+0001,1,1,0.75,.001,trigger-pulse,t 						# trigger-pulse
+0001,1,1,1.02,10,speech,speaker0001/hap-dinner-a.wav 	# Speech onset at 1.02 s, on for 10 s
+0001,1,1,3.25,.001,trigger-pulse,t 						# trigger-pulse
+0001,1,1,4.30,2,circle-fix,circle-fix					# Circle onset at 4.3 s, on for 2 s
+0001,1,1,5.75,.001,trigger-pulse,t 						# trigger-pulse
+0001,1,1,6.10,.01,user-response,a 						# user-response with 'a' key
+0001,1,1,8.25,.001,trigger-pulse,t 						# trigger-pulse
+0001,1,1,10.75,.001,trigger-pulse,t 					# trigger-pulse
+0001,1,1,11.02,10,silence,silence.wav					# Silence onset at 11.02 s, on for 10 s
+0001,1,1,13.25,.001,trigger-pulse,t 					# trigger-pulse
+0001,1,1,14.10,2,circle-fix,circle-fix					# circle onset at 14.10s, on for 2 s
+0001,1,1,15.15,.01,user-response,a 						# user-response with 'a' key, duration-s is RT? 15.15-14.10?
+0001,1,1,15.45,001,trigger-pulse,t

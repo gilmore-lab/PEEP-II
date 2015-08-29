@@ -1,0 +1,4 @@
+participant-id,run,order-id,condition,t-onset,duration-s,stim-type,stim-name
+0001,1,1,happy,4.30,2,circle-fix,circle-fix		# Circle fixation on
+0001,1,1,happy,6.10,.001,user-response,a		# User response at 6.10 s
+
