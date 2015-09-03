@@ -11,6 +11,10 @@ library(dplyr)
 library(ggplot2)
 library(xlsx)
 library(knitr)
+
+# Source external functions
+source('make_peep_order_fr_xlsx.R')
+source('write.order.csv.R')
 ```
 
 ```{r knitr-defaults}
@@ -28,9 +32,6 @@ dir_csv <- 'csv'
 dir_figs <- 'figs'
 
 peep_xlsx <- 'peep-run-orders.xlsx'
-
-# Source external functions
-source(paste('make_peep_order_fr_xlsx.R', sep="/"))
 ```
 
 There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
@@ -71,12 +72,15 @@ This seems to show that we need to normalize/recode the Happy, Angry, Neutral le
 levels(peep_orders$Emotion)
 
 # Now rename to fix
-levels(peep_orders$Emotion) <- list(Angry = c("Angry", "Angry "), 
-                                    Happy = c("Happy", "Happy "),
-                                    Neutral = c("Neu", "Neut"),
-                                    Sad = c("Sad"),
-                                    Silence = c("Sil"))
+levels(peep_orders$Emotion) <- list(ang = c("Angry", "Angry "), 
+                                    hap = c("Happy", "Happy "),
+                                    neu = c("Neu", "Neut"),
+                                    sad = c("Sad"),
+                                    sil = c("Sil"))
 levels(peep_orders$Emotion)
+
+levels(peep_orders$Speaker) <- list( fam = "Mom",
+                                    unf = "Unf")
 ```
 
 Ok, so that's fixed. Let's replot by run and order.
@@ -95,18 +99,18 @@ Now, let's look at scripts.
 
 ```{r}
 peep_filtered <- peep_orders %>%
-  filter(Emotion %in% c('Angry', 'Happy', 'Sad', 'Neutral'),
-         Speaker %in% c('Mom', 'Unf'))
+  filter(Emotion %in% c('ang', 'hap', 'sad', 'neu'),
+         Speaker %in% c('fam', 'unf'))
 with(peep_filtered, xtabs(formula = ~ Emotion + Script + Speaker, drop.unused.levels = TRUE))
 ```
 
 Imbalanced between Neutral 3a and 4a for Mom; Neutrals for b.
 
 ```{r}
-# Split Script and Script_version
-peep_orders$Script_version <- peep_orders$Script
+# Split Script and Version
+peep_orders$Version <- peep_orders$Script
 
-levels(peep_orders$Script_version) <- list(a = c("1a", "2a", "3a", "4a"),
+levels(peep_orders$Version) <- list(a = c("1a", "2a", "3a", "4a"),
                                            b = c("1b", "2b", "3b", "4b"))
 
 levels(peep_orders$Script) <- list('1' = c("1a", "1b"), 
@@ -134,7 +138,7 @@ By version.
 p <- ggplot(peep_orders) +
   aes(x=Stim_index, y=Emotion, 
       color = Emotion,
-      shape = Script_version) + 
+      shape = Version) + 
   geom_point() +
   facet_grid(Order ~ Run)
 p
@@ -147,19 +151,17 @@ Do we have the same number of prosodies for each speaker within each of the four
 ```{r}
 # Here's a better way to visualize whether we are balanced by orders
 peep_filtered <- peep_orders %>%
-  filter(Emotion %in% c('Angry', 'Happy', 'Sad', 'Neutral'))
+  filter(Emotion %in% c('ang', 'hap', 'sad', 'neu'))
 
 xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.levels = TRUE)
 ```
 
 ## Save orders as CSVs
 ```{r save-orders}
-write.table(o1r1, file = paste(dir_csv, 'o1r1.csv', sep='/'), row.names = FALSE)
-write.table(o1r2, file = paste(dir_csv, 'o1r2.csv', sep='/'), row.names = FALSE)
-write.table(o2r1, file = paste(dir_csv, 'o2r1.csv', sep='/'), row.names = FALSE)
-write.table(o2r2, file = paste(dir_csv, 'o2r2.csv', sep='/'), row.names = FALSE)
-write.table(o3r1, file = paste(dir_csv, 'o3r1.csv', sep='/'), row.names = FALSE)
-write.table(o3r2, file = paste(dir_csv, 'o3r2.csv', sep='/'), row.names = FALSE)
-write.table(o4r1, file = paste(dir_csv, 'o4r1.csv', sep='/'), row.names = FALSE)
-write.table(o4r2, file = paste(dir_csv, 'o4r2.csv', sep='/'), row.names = FALSE)
+peep_filtered$Order <- as.numeric(peep_filtered$Order)
+peep_filtered$Script <- as.numeric(peep_filtered$Script)
+peep_filtered$Run <- as.numeric(peep_filtered$Run)
+peep_filtered$Stim_index <- as.numeric(peep_filtered$Stim_index)
+
+write.csv(peep_filtered, paste(dir_csv, 'run_orders.csv', sep='/'), row.names = FALSE)
 ```

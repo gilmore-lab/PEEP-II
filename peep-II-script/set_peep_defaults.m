@@ -11,6 +11,7 @@ session.run = '1';
 session.order = '1';
 
 save('default_session.mat', 'session');
+fprintf('default_session.mat saved\n');
 clear('session');
 
 % Environment
@@ -21,8 +22,10 @@ environment.mri_TR = 2;
 environment.sound_secs = 10;
 environment.silence_secs = 6;
 environment.root_dir = 'peep-II-script';
-environment.data_dir = '/beh';
-environment.sound_dir = '/wav/norm';
+environment.beh_dir = 'beh';
+environment.sound_dir = 'wav/norm';
+environment.run_orders_dir = 'run-orders';
 
 save('default_environment.mat', 'environment');
+fprintf('default_environment.mat saved\n');
 clear('environment');

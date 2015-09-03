@@ -4,6 +4,7 @@ environment = [];
 
 environment.sound_dir = '/wav';
 environment.data_dir = '/mri-behavior';
+enrironment.run_orders_dir = '/run-orders';
 
 environment.mri_TR = 2;
 environment.mri_DISDAQs = 3;
