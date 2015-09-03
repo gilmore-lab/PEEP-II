@@ -5,14 +5,17 @@ date: "`r Sys.time()`"
 output: html_document
 ---
 
-There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
-
 ```{r set-up}
 # Source libraries
 library(ggplot2)
 library(dplyr)
 library(ggplot2)
 library(xlsx)
+library(knitr)
+```
+
+```{r knitr-defaults}
+opts_knit$set(progress = FALSE, warnings = FALSE, eval = TRUE, echo = TRUE, tidy = TRUE, message = FALSE)
 ```
 
 ```{r session-info}
@@ -30,6 +33,8 @@ peep_xlsx <- 'peep-run-orders.xlsx'
 # Source external functions
 source(paste('make_peep_order_fr_xlsx.R', sep="/"))
 ```
+
+There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
 
 ```{r load-data}
 # Function loads .xlsx and turns into a data frame
@@ -92,10 +97,13 @@ So, we need to decide which speaker and script works for the final neutral stimu
 Now, let's look at scripts.
 
 ```{r}
-with(peep_orders, table(Emotion, Script, Speaker))
+peep_filtered <- peep_orders %>%
+  filter(Emotion %in% c('Angry', 'Happy', 'Sad', 'Neutral'),
+         Speaker %in% c('Mom', 'Unf'))
+with(peep_filtered, xtabs(formula = ~ Emotion + Script + Speaker, drop.unused.levels = TRUE))
 ```
 
-Plot to see this in detail.
+Imbalanced between Neutral 3a and 4a for Mom; Neutrals for b.
 
 ```{r}
 # Split Script and Script_version
