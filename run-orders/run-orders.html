@@ -63,12 +63,11 @@ img {
 <div id="header">
 <h1 class="title">PEEP-II-Script-Orders</h1>
 <h4 class="author"><em>rogilmore</em></h4>
-<h4 class="date"><em>2015-09-03 13:18:54</em></h4>
+<h4 class="date"><em>2015-09-03 14:26:04</em></h4>
 </div>
 
 
-<pre class="r"><code># Source libraries
-library(ggplot2)
+<pre class="r"><code>library(ggplot2)
 library(dplyr)</code></pre>
 <pre><code>## 
 ## Attaching package: 'dplyr'
@@ -257,6 +256,17 @@ xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.
 ## Speaker Angry Happy Neutral Sad
 ##     Mom     8     8       8   8
 ##     Unf     8     8      10   8</code></pre>
+</div>
+<div id="save-orders-as-csvs" class="section level2">
+<h2>Save orders as CSVs</h2>
+<pre class="r"><code>write.table(o1r1, file = paste(dir_csv, 'o1r1.csv', sep='/'), row.names = FALSE)
+write.table(o1r2, file = paste(dir_csv, 'o1r2.csv', sep='/'), row.names = FALSE)
+write.table(o2r1, file = paste(dir_csv, 'o2r1.csv', sep='/'), row.names = FALSE)
+write.table(o2r2, file = paste(dir_csv, 'o2r2.csv', sep='/'), row.names = FALSE)
+write.table(o3r1, file = paste(dir_csv, 'o3r1.csv', sep='/'), row.names = FALSE)
+write.table(o3r2, file = paste(dir_csv, 'o3r2.csv', sep='/'), row.names = FALSE)
+write.table(o4r1, file = paste(dir_csv, 'o4r1.csv', sep='/'), row.names = FALSE)
+write.table(o4r2, file = paste(dir_csv, 'o4r2.csv', sep='/'), row.names = FALSE)</code></pre>
 </div>
 
 

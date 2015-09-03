@@ -6,7 +6,6 @@ output: html_document
 ---
 
 ```{r set-up}
-# Source libraries
 library(ggplot2)
 library(dplyr)
 library(ggplot2)
@@ -153,3 +152,14 @@ peep_filtered <- peep_orders %>%
 xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.levels = TRUE)
 ```
 
+## Save orders as CSVs
+```{r save-orders}
+write.table(o1r1, file = paste(dir_csv, 'o1r1.csv', sep='/'), row.names = FALSE)
+write.table(o1r2, file = paste(dir_csv, 'o1r2.csv', sep='/'), row.names = FALSE)
+write.table(o2r1, file = paste(dir_csv, 'o2r1.csv', sep='/'), row.names = FALSE)
+write.table(o2r2, file = paste(dir_csv, 'o2r2.csv', sep='/'), row.names = FALSE)
+write.table(o3r1, file = paste(dir_csv, 'o3r1.csv', sep='/'), row.names = FALSE)
+write.table(o3r2, file = paste(dir_csv, 'o3r2.csv', sep='/'), row.names = FALSE)
+write.table(o4r1, file = paste(dir_csv, 'o4r1.csv', sep='/'), row.names = FALSE)
+write.table(o4r2, file = paste(dir_csv, 'o4r2.csv', sep='/'), row.names = FALSE)
+```
