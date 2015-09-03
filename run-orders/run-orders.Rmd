@@ -92,8 +92,6 @@ p <- ggplot(peep_orders) +
 p
 ```
 
-So, we need to decide which speaker and script works for the final neutral stimulus. It looks like we start with the unfamiliar speaker for all of the initial neutral prosodies, so should we end with Mom?
-
 Now, let's look at scripts.
 
 ```{r}
@@ -143,8 +141,6 @@ p <- ggplot(peep_orders) +
 p
 ```
 
-Ok, so it looks like order 1 uses all a, order 2 all b, and orders 3 and 4 both a and b in the a, b order. 
-
 ## Visualizing balance in design
 
 Do we have the same number of prosodies for each speaker within each of the four orders?
@@ -157,6 +153,3 @@ peep_filtered <- peep_orders %>%
 xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.levels = TRUE)
 ```
 
-No.
-
-Orders 3 & 4 are balanced. Orders 1 & 2 are imbalanced in terms of Neutral scripts. Unf > Mom.
