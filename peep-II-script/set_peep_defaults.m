@@ -20,8 +20,9 @@ end
 environment.mri_TR = 2;
 environment.sound_secs = 10;
 environment.silence_secs = 6;
-environment.data_dir = '/mri-behavior';
-environment.sound_dir = '/wav';
+environment.root_dir = 'peep-II-script';
+environment.data_dir = '/beh';
+environment.sound_dir = '/wav/norm';
 
 save('default_environment.mat', 'environment');
 clear('environment');
