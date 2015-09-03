@@ -5,40 +5,49 @@ date: "`r Sys.time()`"
 output: html_document
 ---
 
-There are four orders, with two runs in each. Sequences should start and end with a neutral prosody. 
+There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
 
 ```{r set-up}
 # Source libraries
 library(ggplot2)
 library(dplyr)
+library(ggplot2)
+library(xlsx)
+```
 
+```{r session-info}
+sessionInfo()
+```
+
+```{r define-paths}
 # Define paths
 dir_xlsx <- 'xlsx'
 dir_csv <- 'csv'
 dir_figs <- 'figs'
+
+peep_xlsx <- 'peep-run-orders.xlsx'
 
 # Source external functions
 source(paste('make_peep_order_fr_xlsx.R', sep="/"))
 ```
 
 ```{r load-data}
-# Function loads .csv and turns into a data frame
+# Function loads .xlsx and turns into a data frame
 
 # Should do list-wise, but faster to do this
-o1r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o1r1.xlsx', sep="/"), 1, 1)
-o1r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o1r2.xlsx', sep="/"), 1, 2)
-o2r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o2r1.xlsx', sep="/"), 2, 1)
-o2r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o2r2.xlsx', sep="/"), 2, 2)
-o3r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o3r1.xlsx', sep="/"), 3, 1)
-o3r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o3r2.xlsx', sep="/"), 3, 2)
-o4r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o4r1.xlsx', sep="/"), 4, 1)
-o4r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, 'o4r2.xlsx', sep="/"), 4, 2)
+o1r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 1, 1, 1)
+o1r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 2, 1, 2)
+o2r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 3, 2, 1)
+o2r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 4, 2, 2)
+o3r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 5, 3, 1)
+o3r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 6, 3, 2)
+o4r1 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 7, 4, 1)
+o4r2 <- make_peep_order_fr_xlsx(paste(dir_xlsx, peep_xlsx, sep="/"), 8, 4, 2)
 
 peep_orders <- rbind(o1r1, o1r2, o2r1, o2r2, o3r1, o3r2, o4r1, o4r2 )
 
 # Make Run, Order, Stim_index a factor
 peep_orders$Run = as.factor(peep_orders$Run)
-
 ```
 
 Visualize orders
@@ -86,9 +95,7 @@ Now, let's look at scripts.
 with(peep_orders, table(Emotion, Script, Speaker))
 ```
 
-Looks like we only have the 1a-4a scripts assigned. Mom has too many angry 4a's and no Happy 4a's. The "" script will go away once we assign that last neutral stimulus. 
-
-Plot to see where the problem is?
+Plot to see this in detail.
 
 ```{r}
 # Split Script and Script_version
@@ -144,10 +151,4 @@ xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.
 
 No.
 
-Order 1: 1 too many Angry+Mom, one too few Happy+Mom. Neutrals ok. (added one each at end)
-
-Order 2: Looks ok.
-
-Order 3: One too many Angry, Happy, and Sad for Mom.
-
-Order 4: Looks ok.
+Orders 3 & 4 are balanced. Orders 1 & 2 are imbalanced in terms of Neutral scripts. Unf > Mom.
