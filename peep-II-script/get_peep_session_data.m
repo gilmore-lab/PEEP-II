@@ -1,11 +1,8 @@
-function session = get_peep_session_data(environment, session)
+function session = get_peep_session_data(environment)
 % get_peep_session_data(environment, session)
 %   
 
-% Load default session, environment info if not passed.
-if not(exist('session', 'var'))
-    load('default_session.mat');
-end
+% Load default environment info if not passed.
 if not(exist('environment', 'var'))
     load('default_environment.mat');
 end 

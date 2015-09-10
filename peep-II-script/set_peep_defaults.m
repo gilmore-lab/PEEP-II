@@ -1,4 +1,4 @@
-% set_peep_defaults.m
+function set_peep_defaults
 % Sets default values for session and environment data structures.
 % Saves to default_session.mat and default_environment.mat.
 
@@ -25,6 +25,8 @@ environment.root_dir = 'peep-II-script';
 environment.beh_dir = 'beh';
 environment.sound_dir = 'wav/norm';
 environment.run_orders_dir = 'run-orders';
+environment.tKey = KbName('t');
+environment.escapeKey = KbName('ESCAPE');
 
 save('default_environment.mat', 'environment');
 fprintf('default_environment.mat saved\n');
