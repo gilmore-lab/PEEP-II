@@ -8,7 +8,7 @@ output: md_document
 
 This is a repo for the PEEP-II project. It documents work related to creating sound file sequences that are balanced across conditions and participants.
 
-See the [run-orders.html](run-orders.html) file for details.
+See the [run-orders.html](https://rawgit.com/gilmore-lab/peep-II/master/run-orders/run-orders.html) file for details.
 
 R version information follows.
 
