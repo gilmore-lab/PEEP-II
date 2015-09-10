@@ -34,7 +34,7 @@ dir_xlsx <- 'xlsx'
 dir_csv <- 'csv'
 dir_figs <- 'figs'
 
-peep_xlsx <- 'peep-run-orders-2015-09-08.xlsx'
+peep_xlsx <- 'peep-run-orders-2015-09-09.xlsx'
 ```
 
 There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
