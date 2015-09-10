@@ -1,6 +1,6 @@
 ---
 title: "PEEP-II-Script-Orders"
-author: "rogilmore"
+author: "Rick Gilmore"
 date: "`r Sys.time()`"
 output: html_document
 ---
@@ -11,10 +11,13 @@ library(dplyr)
 library(ggplot2)
 library(xlsx)
 library(knitr)
+```
 
+```{r external-functions}
 # Source external functions
 source('make_peep_order_fr_xlsx.R')
 source('write.order.csv.R')
+source('update.README.R')
 ```
 
 ```{r knitr-defaults}
@@ -31,7 +34,7 @@ dir_xlsx <- 'xlsx'
 dir_csv <- 'csv'
 dir_figs <- 'figs'
 
-peep_xlsx <- 'peep-run-orders.xlsx'
+peep_xlsx <- 'peep-run-orders-2015-09-08.xlsx'
 ```
 
 There are four orders, with two runs in each. Sequences should start and end with a neutral prosody.
@@ -77,7 +80,6 @@ levels(peep_orders$Emotion) <- list(ang = c("Angry", "Angry "),
                                     neu = c("Neu", "Neut"),
                                     sad = c("Sad"),
                                     sil = c("Sil"))
-levels(peep_orders$Emotion)
 
 levels(peep_orders$Speaker) <- list( fam = "Mom",
                                     unf = "Unf")
@@ -104,7 +106,7 @@ peep_filtered <- peep_orders %>%
 with(peep_filtered, xtabs(formula = ~ Emotion + Script + Speaker, drop.unused.levels = TRUE))
 ```
 
-Imbalanced between Neutral 3a and 4a for Mom; Neutrals for b.
+See Unfamiliar speaker, Neu prosody, scripts 1a, 4a, 2b.
 
 ```{r}
 # Split Script and Version
@@ -154,6 +156,12 @@ peep_filtered <- peep_orders %>%
   filter(Emotion %in% c('ang', 'hap', 'sad', 'neu'))
 
 xtabs( formula = ~ Speaker + Emotion + Order, data = peep_filtered, drop.unused.levels = TRUE)
+
+# And now by script
+xtabs( formula = ~ Speaker + Emotion + Order + Script, data = peep_filtered, drop.unused.levels = TRUE)
+
+# Full design
+xtabs( formula = ~ Speaker + Emotion + Order + Script + Version, data = peep_filtered, drop.unused.levels = TRUE)
 ```
 
 ## Save orders as CSVs

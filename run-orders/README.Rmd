@@ -1,0 +1,17 @@
+---
+title: "README"
+author: "Rick Gilmore"
+date: "September 10, 2015"
+output: md_document
+---
+# README.md
+
+This is a repo for the PEEP-II project. It documents work related to creating sound file sequences that are balanced across conditions and participants.
+
+See the [run-orders.html](run-orders.html) file for details.
+
+R version information follows.
+
+```{r}
+sessionInfo()
+```
