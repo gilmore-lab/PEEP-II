@@ -18,7 +18,7 @@ We have created a consistent file naming convention for the sound files that wil
 
 Each sound file should be named using the following convention:
 
-`<family-id>-{hap,ang,sad,neu}-{1,2,3,4}-{a,b}-{01..n}.wav`
+`<family-id>-{hap,ang,sad,neu}-{din,tlk,chk,hlp}-{a,b}-{01..n}.wav`
 
 Here, the {happy, angry, sad, neutral} prosodies map on to {happy,angry,sad,neutral}; the {din,tlk,chk,hlp} contexts map on to {dinner,talk,checkbook,help}. This keeps the file names reasonably short, but makes them both machine- and human readable.
 
