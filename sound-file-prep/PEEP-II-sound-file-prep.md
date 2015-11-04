@@ -22,6 +22,13 @@ Each sound file should be named using the following convention:
 
 Here, the {happy, angry, sad, neutral} prosodies map on to {happy,angry,sad,neutral}; the {din,tlk,chk,hlp} contexts map on to {dinner,talk,checkbook,help}. This keeps the file names reasonably short, but makes them both machine- and human readable.
 
+| Script # | Script name |
+|----------|-------------|
+| 1        | dinner (din) |
+| 2        | talk (tlk) |
+| 3        | checkbook (chk) |
+| 4        | help (hlp) |
+
 So, a sample file might be `0001-hap-din-a-01.wav` and the full path would be
 `b-peep-project Shared/stimuli/0001/raw/0001-hap-din-a-01.wav`
 
