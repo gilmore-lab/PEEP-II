@@ -5,12 +5,12 @@ if isempty(snd_fn)
     return
 end
 
-[this_snd, snd_freq] = wavread(snd_fn);
-nrchannels = size(this_snd,1);
+[this_snd, snd_freq] = audioread(char(snd_fn));
+nrchannels = size(this_snd,2);
 
 % nrchannels must be 2 for some soundcards
 if nrchannels < 2
-    this_snd = [this_snd ; this_snd];
+    this_snd = [this_snd' ; this_snd'];
     nrchannels = 2;
 end
 

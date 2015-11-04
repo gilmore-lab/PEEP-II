@@ -29,10 +29,10 @@ this_run_data = run_orders(this_run_order, [1 2 3 6 7]);
 fam = strcmp(this_run_data.Speaker, 'fam');
 this_run_data(fam,1) = {this_family};
 this_run_data(~fam,1) = {nov_family};
-this_run_data.File = strcat(this_run_data.Speaker, '-', this_run_data.Emotion, '-', num2str(this_run_data.Script), '-', this_run_data.Version, '.wav');
+this_run_data.File = strcat('wav/', this_run_data.Speaker, '/norm/', this_run_data.Speaker, '-', this_run_data.Emotion, '-', this_run_data.Script, '-', this_run_data.Version, '.wav');
 
 % Convert to struct for more transparent access
-this_run_data = table2str( this_run_data);
+%this_run_data = table2str(this_run_data);
 return
 
 

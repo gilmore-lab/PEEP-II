@@ -1,6 +1,5 @@
-function session = get_peep_session_data(environment)
-% get_peep_session_data(environment, session)
-%   
+function session = get_peep_session_data(session, environment)
+% get_peep_session_data(environment, session) 
 
 % Load default environment info if not passed.
 if not(exist('environment', 'var'))
@@ -10,6 +9,7 @@ end
 % Prompt user for session info
 prompt = {'This family ID (0nnn):', 'Novel family ID (0nnn):', 'Run:', 'Order:', 'RA1:', 'RA2:'};
 title = 'Session Information';
+
 defaults = {session.this_family, session.nov_family, char(session.run), char(session.order), 'RW', 'MM'};
 answers = inputdlg(prompt, title, 1, defaults);
 this_family = answers{1};

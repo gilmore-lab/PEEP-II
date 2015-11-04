@@ -5,8 +5,8 @@ function set_peep_defaults
 if exist('session')
     clear('session')
 end
-session.this_family = '0001';
-session.nov_family = '0002';
+session.this_family = '9999';
+session.nov_family = '9998';
 session.run = '1';
 session.order = '1';
 

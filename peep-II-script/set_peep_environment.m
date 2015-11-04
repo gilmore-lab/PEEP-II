@@ -16,10 +16,10 @@ environment.tKey = KbName('t');
 environment.escapeKey = KbName('ESCAPE');
 
 screenNumbers = Screen('Screens');
-for s = 1:length(environment.screenNumbers)
-    environment.scrNum = screenNumbers(s);
-    environment.hz(s) = Screen('FrameRate', s);
-    environment.rect(s) = Screen('Rect', s);
+for s = 1:length(screenNumbers)
+    environment.scrns(s).scrNum = screenNumbers(s);
+    environment.scrns(s).hz = Screen('FrameRate', screenNumbers(s));
+    environment.scrns(s).rect = Screen('Rect', screenNumbers(s));
 end
 
 return
