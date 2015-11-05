@@ -2,9 +2,15 @@ function set_peep_defaults
 % Sets default values for session and environment data structures.
 % Saves to default_session.mat and default_environment.mat.
 
+% 2015-11-05 rogilmore modified
+
 if exist('session')
     clear('session')
 end
+
+cd('~/github/gilmore-lab/peep-II/peep-II-script');
+
+% Session
 session.this_family = '9999';
 session.nov_family = '9998';
 session.run = '1';
@@ -18,16 +24,38 @@ clear('session');
 if exist('environment')
     clear('environment')
 end
+
+% Scan parameters
+environment.scanner = 'Siemens Prisma 3T';
+environment.center = 'PSU SLEIC, University Park, PA';
 environment.mri_TR = 2;
 environment.sound_secs = 10;
 environment.silence_secs = 6;
+
+% Directories
 environment.root_dir = 'peep-II-script';
 environment.beh_dir = 'beh';
 environment.sound_dir = 'wav/norm';
 environment.run_orders_dir = 'run-orders';
+
+% Keys
 environment.tKey = KbName('t');
 environment.escapeKey = KbName('ESCAPE');
+environment.aKey = KbName('a');
+environment.bKey = KbName('b');
+environment.cKey = KbName('c');
+environment.dKey = KbName('d');
+
+% Screen parameters
+screenNumbers = Screen('Screens');
+for s=1:length(screenNumbers)
+    environment.scrns(s).scrNum = screenNumbers(s);
+    environment.scrns(s).hz = Screen('FrameRate', screenNumbers(s));
+    environment.scrns(s).rect = Screen('Rect', screenNumbers(s));
+end
 
 save('default_environment.mat', 'environment');
 fprintf('default_environment.mat saved\n');
 clear('environment');
+
+return

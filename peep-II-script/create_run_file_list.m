@@ -2,13 +2,16 @@ function this_run_data = create_run_file_list(environment, session)
 % create_run_file_list(environment, session)
 %   Opens run order given current session, environment
 %   and creates a table with the correct file names.
-%
-% 2015-09-10 rogilmore wrote
+
+% 2015-09-10 rogilmore wrote.
+% 2015-11-05 rogilmore modified.
 
 if (nargin < 2)
     load('default_session.mat');
     load('default_environment.mat');
 end
+
+cd('~/github/gilmore-lab/peep-II/peep-II-script');
 
 this_family = session.this_family;
 nov_family = session.nov_family;
@@ -31,8 +34,6 @@ this_run_data(fam,1) = {this_family};
 this_run_data(~fam,1) = {nov_family};
 this_run_data.File = strcat('wav/', this_run_data.Speaker, '/norm/', this_run_data.Speaker, '-', this_run_data.Emotion, '-', this_run_data.Script, '-', this_run_data.Version, '.wav');
 
-% Convert to struct for more transparent access
-%this_run_data = table2str(this_run_data);
 return
 
 
