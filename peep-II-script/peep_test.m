@@ -4,15 +4,15 @@ function peep_test(n_snds)
 
 % 2015-11-04 rogilmore created.
 % 2015-11-05 rogilmore modified.
+% 2015-11-11 rogilmore modified. Added visual displays.
 
 % Wish list:
-% 1. Add visual display of a) instructions, b) fixation/big circle.
 % 3. Write behavioral data, including pulse timing to file.
 
 %-------------------------------------------------------------------------
 
-
 cd('~/github/gilmore-lab/peep-II/peep-II-script/');
+diary(sprintf('diary/%s-diary.txt', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
 
 if nargin < 1
     n_snds = 4;
@@ -27,10 +27,19 @@ run = '1';
 order = '1';
 
 log_fn = strcat('log/', fam_id, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', run, '-order-', order, '.log');
-[log_fid, message] = fopen(log_fn, 'w'); 
+[log_fid, ~] = fopen(log_fn, 'w'); 
 
 log_msg(sprintf('Planning to play %i sounds.\n', n_snds), GetSecs(), log_fid);
 log_msg('Starting peep_test.\n', GetSecs(), log_fid);
+
+try
+    Screen('Preference', 'SkipSyncTests', 1);
+    win_ptr = Screen('OpenWindow', max(Screen('Screens')));
+    txt_2_screen('Welcome to PEEP', win_ptr);
+catch
+    Screen('CloseAll');
+    psychrethrow(psychlasterror);
+end
 
 escapeKey = KbName('ESCAPE');
 tKey = KbName('t');
@@ -67,111 +76,98 @@ InitializePsychSound;
 % a frequency of freq and nrchannels sound channels.
 % This returns a handle to the audio device:
 try
-    % Try with the 'freq'uency we wanted:
     pahandle = PsychPortAudio('Open', [], [], 0, snd_freq, nrchannels);
     PsychPortAudio('FillBuffer', pahandle, this_snd);
 catch
-    % Failed. Retry with default frequency as suggested by device:
     fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', snd_freq);
     fprintf('Sound may sound a bit out of tune, ...\n\n');
     psychlasterror('reset');
     pahandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
 end
 
-% Show ready to start run screen
+% Show ready to start run screen and wait for keypress
 KbReleaseWait;
-% fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
-% fprintf('Press any key when ready to start\n');
-% fprintf(log_fid, '%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
-% fprintf(log_fid, 'Press any key when ready to start\n');
 log_msg(sprintf('Press any key when ready to start\n'), GetSecs(), log_fid);
-
+txt_2_screen('Ready to go!', win_ptr);
 KbStrokeWait;
+
+% When keypressed, start sound
 start_secs = PsychPortAudio('Start', pahandle, 1, 0, 1);
 start_this = start_secs;
 sil_start = start_secs + 12; % Made bigger than 10 s so the interval doesn't start early.
-% fprintf('%s : %07.3f s: ', ts, secs_fr_start);
-% fprintf('Started sound 1 of %i: %s.\n', n_snds, char(this_run_data.File(snd_index)));
-% fprintf(log_fid, '%s : %07.3f s: ', ts, secs_fr_start);
-% fprintf('Started sound 1 of %i: %s.\n', n_snds, char(this_run_data.File(snd_index)));
-log_msg(sprintf('Started sound 1 of %i: %s.\n', n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
+log_msg(sprintf('Snd: Started sound 1 of %i: %s.\n', n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
 silence = 0;
 
 % Show circle
 big_circle = 0;
+fix_2_screen(big_circle, win_ptr)
 change_secs = start_secs + rand(1)*(circle_chg_max_secs-circle_chg_min_secs) + circle_chg_min_secs;
-% fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-% fprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs);
-log_msg(sprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
+log_msg(sprintf('Snd: Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
 
 while 1
     snd_status = PsychPortAudio('GetStatus', pahandle);
-    
-    if GetSecs() > change_secs
-        if big_circle
-            big_circle = 0;
-            change_secs = GetSecs() + (10-snd_status.PositionSecs) + rand(1)*(3) + circle_chg_min_secs;
-%             fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%             fprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs);
-            log_msg(sprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
-        else
-            big_circle = 1;
-            change_secs = change_secs + circle_chg_dur_secs;
-%             fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%             fprintf('Showing fixation + big circle. Change at %07.3f.\n', change_secs-start_secs);
-            log_msg(sprintf('Showing fixation + big circle. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
-        end
-    end
-    
-    if (~snd_status.Active)
-        
+    if snd_status.Active        
+        % During sound, time to change fixation?
+        if GetSecs() > change_secs
+            if big_circle
+                big_circle = 0;
+                fix_2_screen(big_circle, win_ptr);
+                
+                % Compute change time in middle of next silent interval
+                change_secs = GetSecs() + (10-snd_status.PositionSecs) + rand(1)*(3) + circle_chg_min_secs;
+                log_msg(sprintf('Snd : Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
+            else
+                big_circle = 1;
+                fix_2_screen(big_circle, win_ptr);
+                change_secs = change_secs + circle_chg_dur_secs;
+                log_msg(sprintf('Snd : Fix +. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
+            end % if big_circle
+        end % if GetSecs()
+    else % Sound over
         % If not silence yet, start
         if ~silence
+            
+            % If prior sound was last, don't play silence.
             if snd_index == n_snds
-                break
+                break;
             end
             
             % Start silent period
             sil_start = GetSecs();
+            sil_end = sil_start + sil_secs;
             silence = 1;
-%             fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%             fprintf('Sound over after %07.3f s; starting silence.\n', sil_start-start_this);
-            log_msg(sprintf('Sound over after %07.3f s; starting silence.\n', sil_start-start_this), start_secs, log_fid);
+            log_msg(sprintf('Sil : Sound duration %07.3f s.\n', sil_start-start_this), start_secs, log_fid);
             
             % Load next
             snd_index = snd_index + 1;            
-%             fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%             fprintf('Loading sound %i of %i sounds: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index)));
-            log_msg(sprintf('Loading sound %i of %i sounds: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
+            log_msg(sprintf('Sil : Loading sound %i of %i sounds: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
             [this_snd, ~, ~] = load_sound(this_run_data.File(snd_index));
             PsychPortAudio('FillBuffer', pahandle, this_snd, [], 0);
-        end
+        end % if ~silence
         
         % Change circle?
         if (GetSecs() > change_secs)
             if big_circle
                 big_circle = 0;
+                fix_2_screen(big_circle, win_ptr);
+                
                 % Secs remaining in silence + random start in range
-                change_secs = sil_secs - (GetSecs()-sil_start) + rand(1)*(circle_chg_max_secs-circle_chg_min_secs) + circle_chg_min_secs;
-%                 fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%                 fprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs);
-                log_msg(sprintf('Showing fixation. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
+                change_secs = sil_end + rand(1)*(circle_chg_max_secs-circle_chg_min_secs) + circle_chg_min_secs;
+                %change_secs = sil_secs - (GetSecs()-sil_start) + rand(1)*(circle_chg_max_secs-circle_chg_min_secs) + circle_chg_min_secs;
+                log_msg(sprintf('Sil : Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
            else
                 big_circle = 1;
+                fix_2_screen(big_circle, win_ptr);
                 change_secs = change_secs + circle_chg_dur_secs;
-%                 fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%                 fprintf('Showing fixation + big circle. Change at %07.3f.\n', change_secs-start_secs);
-                log_msg(sprintf('Showing fixation + big circle. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
+                log_msg(sprintf('Sil : Fix +. Change at %07.3f.\n', change_secs-start_secs), start_secs, log_fid);
             end
-        end
+        end % if (GetSecs()
 
         % Silence over? Then start new sound.
         if (GetSecs()-sil_start) > sil_secs
             silence = 0;
             start_this = PsychPortAudio('Start', pahandle, 1, 0, 1);
-%             fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%             fprintf('Ended silence with latency %07.3f s. Started sound %i of %i: %s.\n', start_this-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index)));
-            log_msg(sprintf('Ended silence with latency %07.3f s. Started sound %i of %i: %s.\n', start_this-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
+            log_msg(sprintf('Snd : Silence duration %07.3f s. Started sound %i of %i: %s.\n', start_this-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, log_fid);
             sil_start = GetSecs() + 12;
         end
         
@@ -179,27 +175,21 @@ while 1
         [ keyIsDown, keySecs, keyCode ] = KbCheck;
         if keyIsDown
             if keyCode(tKey) % Scanner pulse detected
-%                 fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%                 fprintf('Scanner pulse detected.\n');
                 log_msg(sprintf('Scanner pulse detected.\n'), start_secs, log_fid);
             end
             
             % Participant press
             if ( keyCode(aKey) || keyCode(bKey) || keyCode(cKey) || keyCode(dKey) )
-%                 fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%                 fprintf('Participant press detected.\n');
                 log_msg(sprintf('Participant press detected.\n'), start_secs, log_fid);
             end
             
             % Escape/terminate
             if keyCode(escapeKey)
-%                 fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-%                 fprintf('Escape detected at %07.3f from start.\n', keySecs-start_secs);
                 log_msg(sprintf('Escape detected at %07.3f from start.\n', keySecs-start_secs), start_secs, log_fid);
                 break;
             end
         end
-    end
+    end % if snd_status.Active
     
     [ keyIsDown, keySecs, keyCode ] = KbCheck;
     if keyIsDown
@@ -213,11 +203,17 @@ while 1
 end
 
 % % Clean-up
+
+txt_2_screen('All done!', win_ptr)
 PsychPortAudio('Close', pahandle);
-fprintf('%s : %07.3f s: ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), GetSecs()-start_secs);
-fprintf('Played %i sounds in %07.3f s.\n', snd_index, GetSecs() - start_secs);
 log_msg(sprintf('Played %i sounds in %07.3f s.\n', snd_index, GetSecs() - start_secs), start_secs, log_fid);
 fclose('all');
+
+fprintf('Hit any key to terminate.\n');
+KbStrokeWait;
+
+Screen('CloseAll');
+diary off;
 
 return
 
@@ -247,5 +243,30 @@ fprintf(fid, '%s : %07.3f s: ', ts, secs_fr_start);
 fprintf(fid, msg_text);
 return
 
+%-------------------------------------------------------------------------
+function txt_2_screen(msg_text, win_ptr)
+Screen('FillRect', win_ptr, [127 127 127]);
+Screen('TextFont', win_ptr, 'Courier New');
+Screen('TextSize', win_ptr, 50);
+Screen('TextStyle', win_ptr, 1+2);
+DrawFormattedText(win_ptr, msg_text, 'center', 'center', [0 0 127]);
+Screen('Flip', win_ptr);
+return
 
-
+%-------------------------------------------------------------------------
+function fix_2_screen(big_circle, win_ptr)
+% fix_2_screen(big_circle, win_ptr)
+%
+Screen('FillRect', win_ptr, [127 127 127]);
+scr_rect=Screen('Rect', win_ptr, 1);
+circle_rect = CenterRect([0 0 300 300], scr_rect);
+dot_rect = CenterRect([0 0 50 50], circle_rect);
+if big_circle
+    Screen('FrameOval', win_ptr, [0 0 255], circle_rect, 10, 10);
+    Screen('FillOval', win_ptr, [0 0 255], dot_rect);
+else
+    Screen('TextSize', win_ptr, 100);
+    Screen('FillOval', win_ptr, [0 0 255], dot_rect);
+end
+Screen('Flip', win_ptr);
+return

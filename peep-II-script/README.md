@@ -21,6 +21,8 @@ This is the MRI-study script for the PEEP-II study.
     + Run-time script for MRI session. Called by ```peep_mri.m```
 - ```peep_test.m```
     + Test bed for timing routines prior to full implementation in ```peep_run.m```.
+- ```pre_scan_check.m```
+    + Checks number of .wav files in the directories needed for a given study.
 - ```set_peep_defaults.m```
     + Edit/run to change default parameters in ```default_environment.mat``` and ```default_session.mat```.
 
