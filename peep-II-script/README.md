@@ -23,6 +23,9 @@ This is the MRI-study script for the PEEP-II study.
     + Test bed for timing routines prior to full implementation in ```peep_run.m```.
 - ```pre_scan_check.m```
     + Checks number of .wav files in the directories needed for a given study.
+- ```qq.m```
+    + Rick's convenience function to restore Matlab console and clear screen if a PsychToolbox function hangs.
+    + Press command + period, command + 0, then qq <enter>.
 - ```set_peep_defaults.m```
     + Edit/run to change default parameters in ```default_environment.mat``` and ```default_session.mat```.
 
@@ -34,4 +37,6 @@ This is the MRI-study script for the PEEP-II study.
     + Future home for key presses during MRI and other measures (script ratings?). nnnn-mri-sess-{1,2}.csv, etc.
 - ```wav/```
     + Directory for *.wav sound files. Contains subdirectories for each family <nnnn>/norm and <nnnn>/raw. The <nnnn>/norm directories contain the normalized sounds used in testing.
+- ```diary/```
+    + Directory for diary files (Matlab console output). These are useful in debugging visual displays on single monitor systems.
  

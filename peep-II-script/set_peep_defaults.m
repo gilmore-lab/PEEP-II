@@ -54,6 +54,13 @@ for s=1:length(screenNumbers)
     environment.scrns(s).rect = Screen('Rect', screenNumbers(s));
 end
 
+% Timing constants
+environment.sound_secs = 10;
+environment.sil_secs = 6;
+environment.circle_chg_min_secs = 1.5; % 1.5 s from start of sound or silence
+environment.circle_chg_max_secs = 8.5; % 1.5 s from end of sound or silence
+environment.circle_chg_dur_secs = 1;   % 1 s duration
+
 save('default_environment.mat', 'environment');
 fprintf('default_environment.mat saved\n');
 clear('environment');

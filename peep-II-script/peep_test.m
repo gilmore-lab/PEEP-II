@@ -12,7 +12,7 @@ function peep_test(n_snds)
 %-------------------------------------------------------------------------
 
 cd('~/github/gilmore-lab/peep-II/peep-II-script/');
-diary(sprintf('diary/%s-diary.txt', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
+diary(sprintf('diary/%s-diary.txt', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF')));
 
 if nargin < 1
     n_snds = 4;
@@ -204,12 +204,12 @@ end
 
 % % Clean-up
 
-txt_2_screen('All done!', win_ptr)
+txt_2_screen('All done!', win_ptr);
 PsychPortAudio('Close', pahandle);
 log_msg(sprintf('Played %i sounds in %07.3f s.\n', snd_index, GetSecs() - start_secs), start_secs, log_fid);
 fclose('all');
 
-fprintf('Hit any key to terminate.\n');
+fprintf('Hit any key to terminate and clear participant screen.\n');
 KbStrokeWait;
 
 Screen('CloseAll');
@@ -235,6 +235,9 @@ return
 
 %-------------------------------------------------------------------------
 function log_msg(msg_text, start_secs, fid)
+% log_msg(msg_text, start_secs, fid)
+%   Writes msg_text to log file and to console.
+
 ts = datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF');
 secs_fr_start = GetSecs()-start_secs;
 fprintf('%s : %07.3f s: ', ts, secs_fr_start);
@@ -245,28 +248,46 @@ return
 
 %-------------------------------------------------------------------------
 function txt_2_screen(msg_text, win_ptr)
-Screen('FillRect', win_ptr, [127 127 127]);
-Screen('TextFont', win_ptr, 'Courier New');
-Screen('TextSize', win_ptr, 50);
-Screen('TextStyle', win_ptr, 1+2);
-DrawFormattedText(win_ptr, msg_text, 'center', 'center', [0 0 127]);
-Screen('Flip', win_ptr);
+% txt_2_screen(msg_text, win_ptr)
+%   Writes msg_text to participant screen
+
+try
+    Screen('FillRect', win_ptr, [127 127 127]);
+    Screen('TextFont', win_ptr, 'Courier New');
+    Screen('TextSize', win_ptr, 50);
+    Screen('TextStyle', win_ptr, 1+2);
+    DrawFormattedText(win_ptr, msg_text, 'center', 'center', [0 0 127]);
+    Screen('Flip', win_ptr);
+catch
+    Screen('CloseAll');
+    fprintf('We''ve hit an error.\n');
+    psychrethrow(psychlasterror);
+end
 return
 
 %-------------------------------------------------------------------------
 function fix_2_screen(big_circle, win_ptr)
 % fix_2_screen(big_circle, win_ptr)
-%
-Screen('FillRect', win_ptr, [127 127 127]);
-scr_rect=Screen('Rect', win_ptr, 1);
-circle_rect = CenterRect([0 0 300 300], scr_rect);
-dot_rect = CenterRect([0 0 50 50], circle_rect);
-if big_circle
-    Screen('FrameOval', win_ptr, [0 0 255], circle_rect, 10, 10);
-    Screen('FillOval', win_ptr, [0 0 255], dot_rect);
-else
-    Screen('TextSize', win_ptr, 100);
-    Screen('FillOval', win_ptr, [0 0 255], dot_rect);
+%   Writes fixation stimulus to participant screen.
+%   Switches between circle (fixation) and circle + ring, based on
+%   value of the big_circle flag.
+
+try
+    Screen('FillRect', win_ptr, [127 127 127]);
+    scr_rect=Screen('Rect', win_ptr, 1);
+    circle_rect = CenterRect([0 0 300 300], scr_rect);
+    dot_rect = CenterRect([0 0 50 50], circle_rect);
+    if big_circle
+        Screen('FrameOval', win_ptr, [0 0 255], circle_rect, 10, 10);
+        Screen('FillOval', win_ptr, [0 0 255], dot_rect);
+    else
+        Screen('TextSize', win_ptr, 100);
+        Screen('FillOval', win_ptr, [0 0 255], dot_rect);
+    end
+    Screen('Flip', win_ptr);
+catch
+    Screen('CloseAll');
+    fprintf('We''ve hit an error.\n');
+    psychrethrow(psychlasterror);
 end
-Screen('Flip', win_ptr);
 return
