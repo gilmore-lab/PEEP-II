@@ -1,12 +1,27 @@
 function pre_scan_check(fam_id, nov_id)
-% pre_scan_check(environment, session)
-%   Checks status of sound files, etc. prior to scan.
+% pre_scan_check(fam_id, nov_id)
+%   Checks status of localization, sound files, keyboards prior to scan.
+
+% 2015-11 Rick Gilmore
 
 % 2015-11-05 rogilmore modified
 
-cd('~/github/gilmore-lab/peep-II/peep-II-script');
-n_files_expected = 32;
+if nargin < 2
+    fprintf('Familiar and novel IDs not specified. Using defaults.\n');
+    fam_id = '9999';
+    nov_id = '9998';
+end
 
+%--------------------------------------------------------------------------
+% Check localization
+localize_peep;
+
+%--------------------------------------------------------------------------
+
+
+%--------------------------------------------------------------------------
+% Check wav/ directories for this participant
+n_files_expected = 32;
 fam_dir = strcat('wav/', fam_id, '/norm');
 nov_dir = strcat('wav/', nov_id, '/norm');
 
@@ -16,6 +31,7 @@ nov_dir_info = dir(fullfile(nov_dir, '*.wav'));
 fam_sz = size(fam_dir_info);
 nov_sz = size(nov_dir_info);
 
+fprintf('Checking "familiar".\n');
 fprintf('There are %i .wav files in %s. ', fam_sz(1), fam_dir);
 if fam_sz(1) ~= n_files_expected
     fprintf('Incorrect number of files. Listing.\n');
@@ -27,6 +43,7 @@ else
     fprintf('Ok.\n');
 end
 
+fprintf('\nChecking "novel".\n');
 fprintf('There are %i .wav files in %s. ', nov_sz(1), nov_dir);
 if nov_sz(1) ~= n_files_expected
     fprintf('Incorrect number of files. Listing.\n');
@@ -38,4 +55,8 @@ else
     fprintf('Ok.\n');
 end
 
-return
+%-------------------------------------------------------------------------
+% Check keyboard(s)
+fprintf('\nChecking keyboard(s).\n');
+device_report;
+end

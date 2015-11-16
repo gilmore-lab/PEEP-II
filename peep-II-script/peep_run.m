@@ -1,4 +1,12 @@
 function peep_run(session, environment)
+% peep_run(session, environment)
+%   Controls a particular run of the PEEP-II experiment
+%
+%   Called by: peep_mri.m
+
+% Rick Gilmore, 2015-11-13
+
+% 2015-11   rog wrote
 
 if (nargin < 2)
     load('default_session.mat');
@@ -64,18 +72,6 @@ KbStrokeWait;
 peep_log_msg(sprintf('Ready to run. Start scanner. Script will start automatically on first non-DISDAQ pulse.\n'), GetSecs(), environment.log_fid);
 n_pulses_detected = 0;
 
-% while 1
-%     [ keyIsDown, start_secs, keyCode ] = KbCheck;
-%     if keyIsDown
-%         lastKey = start_secs;
-%         if keyCode(environment.tKey)
-%             n_pulses_detected = n_pulses_detected + 1;
-%             peep_log_msg(sprintf('Scanner pulse %i detected. Starting.\n', n_pulses_detected), start_secs, environment.log_fid);
-%             break;
-%         end
-%     end
-% end
-
 % Create and start Kb queues
 KbQueueCreate(environment.external_kbd_index);
 KbQueueStart(environment.external_kbd_index);
@@ -90,6 +86,7 @@ while 1
         if firstPress(environment.tKey)            
             n_pulses_detected = n_pulses_detected + 1;
             peep_log_msg(sprintf('Scanner pulse %i detected. Starting.\n', n_pulses_detected), start_secs, environment.log_fid);
+            write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid); 
             break;
         end
     end
@@ -112,6 +109,7 @@ try
     silence = 0;
     run_start_time = start_secs;
     peep_log_msg(sprintf('Snd : Started %i of %i: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), run_start_time,environment.log_fid);
+    write_event_2_file(start_secs, 'none', char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'sound_on', environment.csv_fid);
 catch
     peep_log_msg(sprintf('Failed to start sound %i of %i. Aborting.\n.', snd_index, n_snds), run_start_time, environment.log_fid);
     psychlasterror;
@@ -120,7 +118,8 @@ end
 
 % Show fixation
 big_circle = 0;
-fix_2_screen(big_circle, win_ptr, environment)
+fix_2_screen(big_circle, win_ptr, environment);
+write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_off', environment.csv_fid);
 change_secs = snd_start_time + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
 peep_log_msg(sprintf('Snd : Fix -. Change at %07.3f.\n', change_secs-snd_start_time), start_secs, environment.log_fid);
 
@@ -130,7 +129,7 @@ while 1
     if snd_status.Active
         % Detect keypresses from participant/scanner pulse
         [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
-        timeSecs = firstPress(find(firstPress));
+%         timeSecs = firstPress(find(firstPress));
         if pressed
             if firstPress(environment.tKey)
                 n_pulses_detected = n_pulses_detected + 1;
@@ -139,6 +138,7 @@ while 1
             end
             if (firstPress(environment.aKey)) || (firstPress(environment.bKey)) || (firstPress(environment.cKey)) || (firstPress(environment.dKey))
                 peep_log_msg(sprintf('Participant press.\n'), start_secs, environment.log_fid);
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'keypress',environment.csv_fid);
             end
         end
 
@@ -147,7 +147,7 @@ while 1
         timeSecs = firstPress(find(firstPress));
         if pressed
             if firstPress(environment.escapeKey)
-                peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', keySecs-start_secs), start_secs, environment.log_fid);
+                peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
                 break;
             end
         end
@@ -157,13 +157,14 @@ while 1
             if big_circle
                 big_circle = 0;
                 fix_2_screen(big_circle, win_ptr, environment);
-                
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_off', environment.csv_fid);
                 % Compute change time in middle of next silent interval
                 change_secs = GetSecs() + (10-snd_status.PositionSecs) + rand(1)*(3) + environment.circle_chg_min_secs;
                 peep_log_msg(sprintf('Snd : Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, environment.log_fid);
             else
                 big_circle = 1;
                 fix_2_screen(big_circle, win_ptr, environment);
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_on', environment.csv_fid);
                 change_secs = change_secs + environment.circle_chg_dur_secs;
                 peep_log_msg(sprintf('Snd : Fix +. Change at %07.3f.\n', change_secs-start_secs), start_secs, environment.log_fid);
             end % if big_circle
@@ -181,6 +182,7 @@ while 1
             sil_end = sil_start + environment.silence_secs;
             silence = 1;
             peep_log_msg(sprintf('Sil : Sound duration %07.3f s.\n', sil_start-snd_start_time), start_secs, environment.log_fid);
+            write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_off', environment.csv_fid);
             
             % Load next
             snd_index = snd_index + 1;
@@ -194,7 +196,7 @@ while 1
             if big_circle
                 big_circle = 0;
                 fix_2_screen(big_circle, win_ptr, environment);
-                
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_off', environment.csv_fid);
                 % Secs remaining in silence + random start in range
                 change_secs = sil_end + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
                 %change_secs = environment.silence_secs - (GetSecs()-sil_start) + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
@@ -202,6 +204,7 @@ while 1
             else
                 big_circle = 1;
                 fix_2_screen(big_circle, win_ptr, environment);
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_on', environment.csv_fid);
                 change_secs = change_secs + environment.circle_chg_dur_secs;
                 peep_log_msg(sprintf('Sil : Fix +. Change at %07.3f.\n', change_secs-start_secs), start_secs, environment.log_fid);
             end
@@ -212,12 +215,13 @@ while 1
             silence = 0;
             snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
             peep_log_msg(sprintf('Snd : Silence duration %07.3f s. Started sound %i of %i: %s.\n', snd_start_time-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
+            write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_on', environment.csv_fid);
             sil_start = GetSecs() + 12;
         end
         
         % Detect keypresses from participant/scanner pulse
         [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
-        timeSecs = firstPress(find(firstPress));
+%         timeSecs = firstPress(firstPress);
         if pressed
             if firstPress(environment.tKey)
                 n_pulses_detected = n_pulses_detected + 1;
@@ -225,6 +229,7 @@ while 1
             end
             if (firstPress(environment.aKey)) || (firstPress(environment.bKey)) || (firstPress(environment.cKey)) || (firstPress(environment.dKey))
                 peep_log_msg(sprintf('Participant press.\n'), start_secs, environment.log_fid);
+                write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'keypress', environment.csv_fid);
             end
         end
 
@@ -233,30 +238,35 @@ while 1
         timeSecs = firstPress(find(firstPress));
         if pressed
             if firstPress(environment.escapeKey)
-                peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', keySecs-start_secs), start_secs, environment.log_fid);
+                peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
                 break;
             end
         end
         
     end % if snd_status.Active
     
-    [ keyIsDown, keySecs, keyCode ] = KbCheck;
-    if keyIsDown
-        if keySecs > (lastKey + .1)
-            lastKey = keySecs;
-            if keyCode(environment.escapeKey)
-                peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', keySecs-start_secs), start_secs, environment.log_fid);
-                break;
-            end
+    [pressed, firstPress] = KbQueueCheck(environment.internal_kbd_index);
+    timeSecs = firstPress(find(firstPress));
+    if pressed
+        if firstPress(environment.escapeKey)            
+            peep_log_msg(sprintf('Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
+            break;
         end
-    end
+    end    
 end
 
 % Clean-up
+try
+    txt_2_screen('All Finished!', win_ptr, environment);
+catch
+    Screen('CloseAll');
+    psychrethrow(psychlasterror);
+end
+
 KbQueueRelease(environment.external_kbd_index);
 KbQueueRelease(environment.internal_kbd_index);
 PsychPortAudio('Close', pahandle);
 total_secs = GetSecs()-run_start_time;
 [mins, secs] = secs2mins(total_secs);
-peep_log_msg(sprintf('Played %i sounds in %6.3f seconds; %i m %is; detected %i scanner triggers.\n', snd_index, total_secs, mins, secs, n_pulses_detected), run_start_time, environment.log_fid);
+peep_log_msg(sprintf('Played %i sounds in %6.3f seconds; %s:%s; detected %i scanner triggers.\n', snd_index, total_secs, mins, secs, n_pulses_detected), run_start_time, environment.log_fid);
 return

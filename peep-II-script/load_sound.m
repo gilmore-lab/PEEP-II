@@ -1,5 +1,5 @@
-function [this_snd, snd_freq, nrchannels] = load_peep_sound(snd_fn)
-% [this_snd, snd_freq, nrchannels] = load_peep_sound(snd_fn)
+function [this_snd, snd_freq, nrchannels] = load_sound(snd_fn)
+% [this_snd, snd_freq, nrchannels] = load_sound(snd_fn)
 %   Loads sound for PEEP-II study.
 %
 %   Called by: peep_run.m
@@ -21,4 +21,3 @@ catch
 end
 
 return
-

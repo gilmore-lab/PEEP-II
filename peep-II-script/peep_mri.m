@@ -34,12 +34,27 @@ log_fn = strcat('log/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'
 peep_log_msg('Opened log file: log_fn\n', GetSecs(), log_fid);
 environment.log_fid = log_fid;
 
+% Create run-specific event file
+csv_fn = strcat('csv/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
+[csv_fid, ~] = fopen(csv_fn, 'w');
+peep_log_msg('Opened csv file: %s\n', GetSecs(), csv_fid);
+fprintf(csv_fid, 'date_time,secs_from_start,vis_ring,snd_playing,mri_vol,event_type\n');
+environment.csv_fid = csv_fid;
+
+% Run experiment
 peep_run(session, environment);
  
 % Clean-up
 diary off;
 fclose('all');
-Screen('CloseAll');
 
+% Experimenter terminates participant screen with ESCAPE.
+fprintf('Press "ESCAPE" key to end study.\n');
+keysOfInterest(KbName('ESCAPE'))=1;
+KbQueueCreate(environment.internal_kbd_index, keysOfInterest);
+KbQueueRelease(environment.internal_kbd_index);
+
+Screen('CloseAll');
+end
 
 
