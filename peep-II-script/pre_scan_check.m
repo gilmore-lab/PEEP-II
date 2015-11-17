@@ -4,20 +4,19 @@ function pre_scan_check(fam_id, nov_id)
 
 % 2015-11 Rick Gilmore
 
-% 2015-11-05 rogilmore modified
+% 2015-11-05 rog modified.
+% 2015-11-16 rog added localize_peep, keyboard check.
+%--------------------------------------------------------------------------
 
 if nargin < 2
-    fprintf('Familiar and novel IDs not specified. Using defaults.\n');
     fam_id = '9999';
     nov_id = '9998';
+    fprintf('Familiar and novel IDs not specified. Using defaults: fam %s, nov %s.\n', fam_id, nov_id);
 end
 
 %--------------------------------------------------------------------------
 % Check localization
 localize_peep;
-
-%--------------------------------------------------------------------------
-
 
 %--------------------------------------------------------------------------
 % Check wav/ directories for this participant

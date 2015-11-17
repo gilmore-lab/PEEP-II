@@ -1,7 +1,11 @@
-function peep_mri()
+function peep_mri
+% peep_mri
+%   Runs PEEP-II MRI protocol.
 
-% Change to project working directory
-cd('~/github/gilmore-lab/peep-II/peep-II-script');
+% 2015-11 Rick Gilmore created
+
+% 2015-11 rog modified.
+%--------------------------------------------------------------------------
 
 % Start diary
 diary(sprintf('diary/%s-diary.txt', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF')));
@@ -17,6 +21,7 @@ fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
 fprintf('This is the PEEP-II script.\n\n');
 
 % Load environment, session info
+
 environment = set_peep_environment();
 fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
 fprintf('Loaded environment.\n\n');
@@ -44,17 +49,15 @@ environment.csv_fid = csv_fid;
 % Run experiment
 peep_run(session, environment);
  
+KbReleaseWait;
+peep_log_msg(sprintf('Press any key to clear participant screen and end study.\n\n'), GetSecs(), environment.log_fid);
+KbStrokeWait;
+
 % Clean-up
 diary off;
 fclose('all');
-
-% Experimenter terminates participant screen with ESCAPE.
-fprintf('Press "ESCAPE" key to end study.\n');
-keysOfInterest(KbName('ESCAPE'))=1;
-KbQueueCreate(environment.internal_kbd_index, keysOfInterest);
-KbQueueRelease(environment.internal_kbd_index);
-
 Screen('CloseAll');
+
 end
 
 

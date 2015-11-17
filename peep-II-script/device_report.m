@@ -11,6 +11,8 @@ function [ keyboardIndices, productNames ] = device_report
 % 2015-11-13 Rick Gilmore
 
 % 2015-11-13 rog wrote
+% 2015-11-16 rog fixed Nordic NeuroLabs indexing.
+%--------------------------------------------------------------------------
 
 [keyboardIndices, productNames, ~] = GetKeyboardIndices();
 
@@ -29,8 +31,8 @@ end
 
 test_keys(keyboardIndices(internal_kbd), char(productNames(internal_kbd)), 'ESCAPE', 'ESCAPE');
 
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'a', 'left index');
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'b', 'left thumb');
+test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'b', 'left index');
+test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'a', 'left thumb');
 test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'c', 'right index');
 test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'd', 'right thumb');
 end

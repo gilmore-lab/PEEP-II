@@ -5,6 +5,7 @@ function localize_peep(peep_home)
 % 2015-11-13 Rick Gilmore
 
 % 2015-11-13 rog wrote
+%--------------------------------------------------------------------------
 
 if nargin < 1
     peep_home = 'peep-II-script';
@@ -14,7 +15,7 @@ dir_peep_home = FindFolder(peep_home);
 fprintf('Found PEEP-II home directory %s.\n', dir_peep_home);
 
 fprintf('Changing to that directory.\n');
-cd(dir_peep_home)
+cd(dir_peep_home);
 
 fprintf('Adding directory to path.\n');
 PathListIsMember(FindFolder('peep-II-script'))

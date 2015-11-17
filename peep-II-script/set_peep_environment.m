@@ -1,8 +1,25 @@
 function environment = set_peep_environment
+% environment = set_peep_environment
+%   Sets environment-level variables for PEEP-II study.
+
+% 2015-11 Rick Gilmore wrote
+
+% 2015-11-16 rog added locale switching.
+%--------------------------------------------------------------------------
 
 % Clear if already in workspace
 if exist('environment', 'var')
     clear('environment')
+end
+
+% Where are we running? Useful for parsing keyboard data.
+locale = input('SLEIC (1) or elsewhere (2): ');
+if locale == 1
+    environment.locale_text = 'SLEIC';
+    fprintf('Locale: SLEIC.\n');
+else
+    environment.locale_text = 'Not SLEIC';
+    fprintf('Locale: Not SLEIC.\n')
 end
 
 % Scan parameters
@@ -15,7 +32,6 @@ environment.silence_secs = 6;
 % Directories
 environment.root_dir = 'peep-II-script';
 environment.beh_dir = 'beh';
-environment.sound_dir = 'wav/norm';
 environment.run_orders_dir = 'run-orders';
 
 % Keys
@@ -40,11 +56,26 @@ try
         environment.scrns(s).rect = Screen('Rect', screenNumbers(s));
     end
     environment.screenNumbers = screenNumbers;
+    
     [keyboardIndices, productNames, ~] = GetKeyboardIndices();
     environment.keyboardIndices = keyboardIndices;
     nkbds = length(keyboardIndices);
-    environment.external_kbd_index = keyboardIndices(max(nkbds));
-    environment.internal_kbd_index = keyboardIndices(1);
+    
+    % Keyboards at SLEIC using USB HUB
+    % Keyboard 1 of 4: index 3: name "Apple Internal Keyboard / Trackpad"
+    % Keyboard 2 of 4: index 6: name "932"
+    % Keyboard 3 of 4: index 7: name "KeyWarrior8 Flex"
+    % Keyboard 4 of 4: index 10: name "TRIGI-USB" -- scanner trigger
+    if locale ~= 1
+        environment.internal_kbd_index = keyboardIndices(1);
+        environment.external_kbd_index = keyboardIndices(max(nkbds));
+        environment.trigger_kbd_index = environment.external_kbd_index;
+    else
+        environment.internal_kbd_index = keyboardIndices(1);
+        environment.external_kbd_index = keyboardIndices(3); %? could be 2 or 3
+        environment.trigger_kbd_index = keyboardIndices(max(nkbds));
+    end
+    
     environment.productNames = productNames;
     white = WhiteIndex(max(screenNumbers));
     black = BlackIndex(max(screenNumbers)); 

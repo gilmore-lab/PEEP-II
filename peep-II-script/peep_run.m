@@ -1,12 +1,15 @@
 function peep_run(session, environment)
 % peep_run(session, environment)
-%   Controls a particular run of the PEEP-II experiment
+%   Controls a particular run of the PEEP-II experiment.
 %
 %   Called by: peep_mri.m
 
 % Rick Gilmore, 2015-11-13
 
-% 2015-11   rog wrote
+% 2015-11-xx rog wrote
+% 2015-11-16 rog added separate keyboard detection.
+%--------------------------------------------------------------------------
+
 
 if (nargin < 2)
     load('default_session.mat');
@@ -85,7 +88,7 @@ while 1
     if pressed
         if firstPress(environment.tKey)            
             n_pulses_detected = n_pulses_detected + 1;
-            peep_log_msg(sprintf('Scanner pulse %i detected. Starting.\n', n_pulses_detected), start_secs, environment.log_fid);
+            peep_log_msg(sprintf('Scanner pulse %i detected. Starting. \n', n_pulses_detected), start_secs, environment.log_fid);
             write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid); 
             break;
         end
@@ -127,15 +130,19 @@ peep_log_msg(sprintf('Snd : Fix -. Change at %07.3f.\n', change_secs-snd_start_t
 while 1
     snd_status = PsychPortAudio('GetStatus', pahandle);
     if snd_status.Active
-        % Detect keypresses from participant/scanner pulse
-        [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
-%         timeSecs = firstPress(find(firstPress));
+        
+        % Detect keypress from scanner pulse
+        [pressed, firstPress] = KbQueueCheck(environment.trigger_kbd_index);
         if pressed
             if firstPress(environment.tKey)
                 n_pulses_detected = n_pulses_detected + 1;
-                peep_log_msg(sprintf('Scanner pulse %i detected. Starting.\n', n_pulses_detected), start_secs, environment.log_fid);
-                break;
+                peep_log_msg(sprintf('Scanner pulse %i detected.\n', n_pulses_detected), start_secs, environment.log_fid);
             end
+        end
+        
+        % Detect keypress from participant
+        [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
+        if pressed
             if (firstPress(environment.aKey)) || (firstPress(environment.bKey)) || (firstPress(environment.cKey)) || (firstPress(environment.dKey))
                 peep_log_msg(sprintf('Participant press.\n'), start_secs, environment.log_fid);
                 write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'keypress',environment.csv_fid);
@@ -219,14 +226,18 @@ while 1
             sil_start = GetSecs() + 12;
         end
         
-        % Detect keypresses from participant/scanner pulse
-        [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
-%         timeSecs = firstPress(firstPress);
+        % Detect scanner pulse
+        [pressed, firstPress] = KbQueueCheck(environment.trigger_kbd_index);
         if pressed
             if firstPress(environment.tKey)
                 n_pulses_detected = n_pulses_detected + 1;
                 peep_log_msg(sprintf('Scanner pulse %i detected. Starting.\n', n_pulses_detected), start_secs, environment.log_fid);
             end
+        end
+        
+        % Detect user keypress
+        [pressed, firstPress] = KbQueueCheck(environment.external_kbd_index);
+        if pressed
             if (firstPress(environment.aKey)) || (firstPress(environment.bKey)) || (firstPress(environment.cKey)) || (firstPress(environment.dKey))
                 peep_log_msg(sprintf('Participant press.\n'), start_secs, environment.log_fid);
                 write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'keypress', environment.csv_fid);
@@ -261,6 +272,9 @@ try
 catch
     Screen('CloseAll');
     psychrethrow(psychlasterror);
+    diary off;
+    fclose('all');
+    Screen('CloseAll');
 end
 
 KbQueueRelease(environment.external_kbd_index);
