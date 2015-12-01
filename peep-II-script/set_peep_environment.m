@@ -13,14 +13,7 @@ if exist('environment', 'var')
 end
 
 % Where are we running? Useful for parsing keyboard data.
-locale = input('SLEIC (1) or elsewhere (2): ');
-if locale == 1
-    environment.locale_text = 'SLEIC';
-    fprintf('Locale: SLEIC.\n');
-else
-    environment.locale_text = 'Not SLEIC';
-    fprintf('Locale: Not SLEIC.\n')
-end
+kbds = input('Keyboards (1), (2), or (3)?: ');
 
 % Scan parameters
 environment.scanner = 'Siemens Prisma 3T';
@@ -66,15 +59,31 @@ try
     % Keyboard 2 of 4: index 6: name "932"
     % Keyboard 3 of 4: index 7: name "KeyWarrior8 Flex"
     % Keyboard 4 of 4: index 10: name "TRIGI-USB" -- scanner trigger
-    if locale ~= 1
-        environment.internal_kbd_index = keyboardIndices(1);
-        environment.external_kbd_index = keyboardIndices(max(nkbds));
-        environment.trigger_kbd_index = environment.external_kbd_index;
-    else
-        environment.internal_kbd_index = keyboardIndices(1);
-        environment.external_kbd_index = keyboardIndices(3); %? could be 2 or 3
-        environment.trigger_kbd_index = keyboardIndices(max(nkbds));
-    end
+    
+    environment.kbds = kbds;
+    keysOfInterest=zeros(3,256); % make kbds x 256 array, then index
+    keysOfInterest(1, KbName('ESCAPE'))=1;   
+    keysOfInterest(2, KbName('a'))=1;
+    keysOfInterest(2, KbName('b'))=1;
+    keysOfInterest(2, KbName('c'))=1;
+    keysOfInterest(2, KbName('d'))=1;
+    keysOfInterest(3, KbName('t'))=1;
+    environment.keysOfInterest = keysOfInterest;
+
+    switch kbds
+        case 2 % laptop + external keyboard (Rick's set-up)
+            environment.internal_kbd_index = keyboardIndices(1);
+            environment.external_kbd_index = keyboardIndices(2);
+            environment.trigger_kbd_index = environment.external_kbd_index;
+        case 3 % laptop + grips + trigger (at SLEIC)
+            environment.internal_kbd_index = keyboardIndices(1);
+            environment.external_kbd_index = keyboardIndices(3);
+            environment.trigger_kbd_index = keyboardIndices(4);
+        otherwise
+            environment.internal_kbd_index = keyboardIndices(1);
+            environment.external_kbd_index = keyboardIndices(1);
+            environment.trigger_kbd_index = keyboardIndices(1);
+    end % switch
     
     environment.productNames = productNames;
     white = WhiteIndex(max(screenNumbers));

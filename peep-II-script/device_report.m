@@ -23,11 +23,20 @@ end
 fprintf('\n');
 
 internal_kbd = 1;
-if length(keyboardIndices) <= 1
-    external_kbd = 1;
-else
-    external_kbd = 2;
+switch length(keyboardIndices)
+    case 1
+        external_kbd = 1;
+    case 2
+        external_kbd = 2;
+    otherwise
+        external_kbd = 3;
 end
+
+% if length(keyboardIndices) <= 1
+%     external_kbd = 1;
+% else
+%     external_kbd = 3;
+% end
 
 test_keys(keyboardIndices(internal_kbd), char(productNames(internal_kbd)), 'ESCAPE', 'ESCAPE');
 
@@ -41,7 +50,7 @@ function test_keys(kbdIndex, kbd_name, key_returned, key_label)
 keysOfInterest=zeros(1,256);
 keysOfInterest(KbName(key_returned))=1;
 KbQueueCreate(kbdIndex, keysOfInterest);
-fprintf('Press %s button on %s.\n', key_label, kbd_name);
+fprintf('Press %s button on %s to print %s character.\n', key_label, kbd_name, key_returned);
 startSecs = GetSecs;
 KbQueueStart(kbdIndex);
 timeSecs = KbQueueWait(kbdIndex);

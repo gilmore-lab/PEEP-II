@@ -11,6 +11,7 @@ if (nargin < 2)
     load('default_environment.mat');
 end
 
+curr_dir = pwd();
 cd('~/github/gilmore-lab/peep-II/peep-II-script');
 
 this_family = session.this_family;
@@ -34,6 +35,7 @@ this_run_data(fam,1) = {this_family};
 this_run_data(~fam,1) = {nov_family};
 this_run_data.File = strcat('wav/', this_run_data.Speaker, '/norm/', this_run_data.Speaker, '-', this_run_data.Emotion, '-', this_run_data.Script, '-', this_run_data.Version, '.wav');
 
+cd(curr_dir);
 return
 
 

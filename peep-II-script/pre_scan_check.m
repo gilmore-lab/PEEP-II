@@ -6,6 +6,7 @@ function pre_scan_check(fam_id, nov_id)
 
 % 2015-11-05 rog modified.
 % 2015-11-16 rog added localize_peep, keyboard check.
+% 2015-12-01 rog added sound test loop.
 %--------------------------------------------------------------------------
 
 if nargin < 2
@@ -13,6 +14,9 @@ if nargin < 2
     nov_id = '9998';
     fprintf('Familiar and novel IDs not specified. Using defaults: fam %s, nov %s.\n', fam_id, nov_id);
 end
+
+%--------------------------------------------------------------------------
+test_snd = '-neu-chk-a.wav';
 
 %--------------------------------------------------------------------------
 % Check localization
@@ -46,10 +50,10 @@ fprintf('\nChecking "novel".\n');
 fprintf('There are %i .wav files in %s. ', nov_sz(1), nov_dir);
 if nov_sz(1) ~= n_files_expected
     fprintf('Incorrect number of files. Listing.\n');
-    dir(fullfile(fam_dir, strcat(nov_id, '-ang-*.wav')))
-    dir(fullfile(fam_dir, strcat(nov_id, '-hap-*.wav')))
-    dir(fullfile(fam_dir, strcat(nov_id, '-neu-*.wav')))
-    dir(fullfile(fam_dir, strcat(nov_id, '-sad-*.wav')))
+    dir(fullfile(nov_dir, strcat(nov_id, '-ang-*.wav')))
+    dir(fullfile(nov_dir, strcat(nov_id, '-hap-*.wav')))
+    dir(fullfile(nov_dir, strcat(nov_id, '-neu-*.wav')))
+    dir(fullfile(nov_dir, strcat(nov_id, '-sad-*.wav')))
 else
     fprintf('Ok.\n');
 end
@@ -58,4 +62,57 @@ end
 % Check keyboard(s)
 fprintf('\nChecking keyboard(s).\n');
 device_report;
+
+%-------------------------------------------------------------------------
+% Check sounds
+InitializePsychSound;
+snd_fn = fullfile(nov_dir, strcat(nov_id, test_snd));
+[this_snd, snd_freq, nrchannels] = load_peep_sound(snd_fn);
+try
+    % Try with the frequency we want
+    pahandle = PsychPortAudio('Open', [], [], 0, snd_freq, nrchannels);
+    PsychPortAudio('FillBuffer', pahandle, this_snd);
+catch
+    % Failed. Retry with default frequency as suggested by device:
+    fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', snd_freq);
+    fprintf('Sound may sound a bit out of tune, ...\n\n');
+    psychlasterror('reset');
+    pahandle = PsychPortAudio('Open', [], [], 0, [], nrchannels);
+end
+
+% Start and stop playing test sound, loops until key press
+
+[keyboardIndices, ~, ~] = GetKeyboardIndices();
+try
+    KbReleaseWait;
+    fprintf('Press any key to START playing test sounds.\n');
+    KbStrokeWait;
+    fprintf('Sound starting.\n');
+    PsychPortAudio('Start', pahandle, 1, 0, 1);
+    snd_status = PsychPortAudio('GetStatus', pahandle);
+    if snd_status.Active
+        fprintf('Press any key to STOP playing sounds.\n');
+    else
+        fprintf('Sound did not start.\n');
+        return;
+    end
+    while 1
+        snd_status = PsychPortAudio('GetStatus', pahandle);
+        if ~snd_status.Active
+            PsychPortAudio('Start', pahandle, 1, 0, 1);
+        end
+        [keyIsDown, ~, ~, ~] = KbCheck(keyboardIndices(1));
+        if keyIsDown
+            break;
+        end        
+    end
+    fprintf('Sound stopped.\n');
+catch
+    psychlasterror;
+    psychlasterror('reset');
+end
+
+PsychPortAudio('Close', pahandle);
+Screen('CloseAll');
+
 end
