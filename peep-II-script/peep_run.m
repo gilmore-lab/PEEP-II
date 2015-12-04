@@ -9,6 +9,7 @@ function peep_ratings(session, environment)
 % 2015-11-xx rog wrote
 % 2015-11-16 rog added separate keyboard detection.
 % 2015-11-18 rog added switch b/w keyboard detection modes
+% 2015-12-03 add 10s sound at beginning, 6s at end, fix orders 3 and 4.
 %--------------------------------------------------------------------------
 
 if (nargin < 2)
@@ -54,7 +55,7 @@ InitializePsychSound;
 try
     % Try with the frequency we want
     pahandle = PsychPortAudio('Open', [], [], 0, snd_freq, nrchannels);
-    PsychPortAudio('FillBuffer', pahandle, this_snd);
+%     PsychPortAudio('FillBuffer', pahandle, this_snd);
 catch
     % Failed. Retry with default frequency as suggested by device:
     fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', snd_freq);
@@ -106,8 +107,9 @@ while 1
     timeSecs = firstPress(find(firstPress));
     start_secs = timeSecs;
     if pressed
-        if firstPress(environment.tKey)            
+        if firstPress(environment.tKey)          
             n_pulses_detected = n_pulses_detected + 1;
+            run_start_time = start_secs;
             peep_log_msg(sprintf('Non : Scanner pulse %i detected. Starting. \n', n_pulses_detected), start_secs, environment.log_fid);
             write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid); 
             break;
@@ -126,31 +128,18 @@ end
 KbEventFlush(environment.internal_kbd_index);
 KbEventFlush(environment.trigger_kbd_index);
 
-% Play first sound
-try
-    snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
-    silence = 0;
-    run_start_time = start_secs;
-    peep_log_msg(sprintf('Snd : Started %i of %i: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), run_start_time,environment.log_fid);
-    write_event_2_file(start_secs, 'none', char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'sound_on', environment.csv_fid);
-catch
-    peep_log_msg(sprintf('Failed to start sound %i of %i. Aborting.\n.', snd_index, n_snds), run_start_time, environment.log_fid);
-    psychlasterror;
-    psychlasterror('reset');
-end
-
-% Show fixation
+% Show fixation, prepare to enter trial loop
 big_circle = 0;
+silence = 0;
 fix_2_screen(big_circle, win_ptr, environment);
-write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'ring_off', environment.csv_fid);
-change_secs = snd_start_time + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
-peep_log_msg(sprintf('Snd : Fix -. Change at %07.3f.\n', change_secs-snd_start_time), start_secs, environment.log_fid);
+change_secs = start_secs + environment.silence_secs + environment.extra_silence + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
+peep_log_msg(sprintf('Sil : Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, environment.log_fid);
+write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_off', environment.csv_fid);
 
 % Then loop for other sounds
 while 1
     snd_status = PsychPortAudio('GetStatus', pahandle);
     if snd_status.Active
-
         switch environment.kbds
             case 3 % SLEIC
                 % Detect keypress from scanner pulse
@@ -208,9 +197,11 @@ while 1
                         n_pulses_detected = n_pulses_detected + 1;
                         peep_log_msg(sprintf('Snd : Scanner pulse %i detected.\n', n_pulses_detected), start_secs, environment.log_fid);
                         write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid);
+                        sprintf('\b\r');
                     else
                         peep_log_msg(sprintf('Snd : Participant press.\n'), start_secs, environment.log_fid);
                         write_event_2_file(start_secs, num2str(big_circle), char(this_run_data.File(snd_index)), num2str(n_pulses_detected), 'keypress',environment.csv_fid);
+                        sprintf('\b\r');
                     end % if firstPress
                 end % if pressed
         end % switch
@@ -300,23 +291,23 @@ while 1
 
         % If not silence yet, start
         if ~silence
-            % If prior sound was last, don't play silence.
-            if snd_index == n_snds
-                break;
-            end
-            
             % Start silent period
             sil_start = GetSecs();
-            sil_end = sil_start + environment.silence_secs;
-            silence = 1;
-            peep_log_msg(sprintf('Sil : Sound duration %07.3f s.\n', sil_start-snd_start_time), start_secs, environment.log_fid);
+            silence = 1;   
+            if snd_index == 1 % first silence
+                sil_end = sil_start + environment.silence_secs + environment.extra_silence;
+                peep_log_msg(sprintf('Sil : Intro silence, end at %07.3f.\n', sil_end-start_secs), start_secs, environment.log_fid);
+            else
+                sil_end = sil_start + environment.silence_secs;
+                peep_log_msg(sprintf('Sil : Sound duration %07.3f s.\n', sil_start-snd_start_time), start_secs, environment.log_fid);
+            end            
             write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_off', environment.csv_fid);
             
             % Load next
-            snd_index = snd_index + 1;
             peep_log_msg(sprintf('Sil : Loading sound %i of %i : %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
             [this_snd, ~, ~] = load_peep_sound(this_run_data.File(snd_index));
             PsychPortAudio('FillBuffer', pahandle, this_snd, [], 0);
+            snd_index = snd_index + 1;
         end % if ~silence
         
         % Change circle?
@@ -339,7 +330,8 @@ while 1
         end % if (GetSecs()
         
         % Silence over? Then start new sound.
-        if (GetSecs()-sil_start) > environment.silence_secs
+        if (GetSecs() > sil_end)
+%         if (GetSecs()-sil_start) > environment.silence_secs
             silence = 0;
             snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
             peep_log_msg(sprintf('Snd : Silence duration %07.3f s. Started sound %i of %i: %s.\n', snd_start_time-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
@@ -372,7 +364,7 @@ KbQueueRelease(environment.internal_kbd_index);
 
 % All done screen
 try
-    txt_2_screen('All Finished!', win_ptr, environment);
+    txt_2_screen('Relax.', win_ptr, environment);
 catch
     Screen('CloseAll');
     psychrethrow(psychlasterror);

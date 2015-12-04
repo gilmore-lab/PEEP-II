@@ -4,6 +4,11 @@ function [this_snd, snd_freq, nrchannels] = load_peep_sound(snd_fn)
 %
 %   Called by: peep_run.m
 
+% Rick Gilmore, 2015
+
+% 2015-12-02 rog modified to deal with cell array to char str conversion.
+
+snd_fn = char(snd_fn);
 try
     [this_snd, snd_freq] = audioread(char(snd_fn));
     nrchannels = size(this_snd,2);

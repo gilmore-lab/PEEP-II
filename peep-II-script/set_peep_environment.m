@@ -21,6 +21,7 @@ environment.center = 'PSU SLEIC, University Park, PA';
 environment.mri_TR = 2;
 environment.sound_secs = 10;
 environment.silence_secs = 6;
+environment.extra_silence = 4; % extra silence at start of study
 
 % Directories
 environment.root_dir = 'peep-II-script';
