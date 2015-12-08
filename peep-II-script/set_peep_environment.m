@@ -12,9 +12,6 @@ if exist('environment', 'var')
     clear('environment')
 end
 
-% Where are we running? Useful for parsing keyboard data.
-kbds = input('Keyboards (1), (2), or (3)?: ');
-
 % Scan parameters
 environment.scanner = 'Siemens Prisma 3T';
 environment.center = 'PSU SLEIC, University Park, PA';
@@ -53,42 +50,53 @@ try
     
     [keyboardIndices, productNames, ~] = GetKeyboardIndices();
     environment.keyboardIndices = keyboardIndices;
-    nkbds = length(keyboardIndices);
     
-    % Keyboards at SLEIC using USB HUB
-    % Keyboard 1 of 4: index 3: name "Apple Internal Keyboard / Trackpad"
-    % Keyboard 2 of 4: index 6: name "932"
-    % Keyboard 3 of 4: index 7: name "KeyWarrior8 Flex"
-    % Keyboard 4 of 4: index 10: name "TRIGI-USB" -- scanner trigger
+    kbds = length(keyboardIndices);
+    fprintf('%s : Detected %i input devices.\n', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), kbds);
+    for k = 1:kbds
+        switch char(productNames(k))
+            case 'Apple Internal Keyboard / Trackpad'
+                environment.internal_kbd_i = k;
+                environment.internal_kbd_index = keyboardIndices(k);
+                if length(keyboardIndices) == 1
+                    environment.external_kbd_i = k;
+                    environment.external_kbd_index = keyboardIndices(k);
+                    environment.trigger_kbd_i = k;
+                    environment.trigger_kbd_index = keyboardIndices(k);
+                end
+            case 'KeyWarrior8 Flex'
+                environment.external_kbd_i = k;
+                environment.external_kbd_index = keyboardIndices(k);
+            case 'TRIGI-USB'
+                environment.trigger_kbd_i = k;
+                environment.trigger_kbd_index = keyboardIndices(k);
+            case 'Apple External Keyboard'
+                environment.external_kbd_i = k;
+                environment.trigger_kbd_i = k;
+                environment.external_kbd_index = keyboardIndices(k);
+                environment.trigger_kbd_index = keyboardIndices(k);
+        end
+    end
     
     environment.kbds = kbds;
-    keysOfInterest=zeros(3,256); % make kbds x 256 array, then index
-    keysOfInterest(1, KbName('ESCAPE'))=1;   
-    keysOfInterest(2, KbName('a'))=1;
-    keysOfInterest(2, KbName('b'))=1;
-    keysOfInterest(2, KbName('c'))=1;
-    keysOfInterest(2, KbName('d'))=1;
-    keysOfInterest(3, KbName('t'))=1;
-    environment.keysOfInterest = keysOfInterest;
-
-    switch kbds
-        case 2 % laptop + external keyboard (Rick's set-up)
-            environment.internal_kbd_index = keyboardIndices(1);
-            environment.external_kbd_index = keyboardIndices(2);
-            environment.trigger_kbd_index = environment.external_kbd_index;
-        case 3 % laptop + grips + trigger (at SLEIC)
-            environment.internal_kbd_index = keyboardIndices(1);
-            environment.external_kbd_index = keyboardIndices(3);
-            environment.trigger_kbd_index = keyboardIndices(4);
-        otherwise
-            environment.internal_kbd_index = keyboardIndices(1);
-            environment.external_kbd_index = keyboardIndices(1);
-            environment.trigger_kbd_index = keyboardIndices(1);
-    end % switch
+    keysOfInterest=zeros(kbds,256); % make kbds x 256 array, then index
     
+    % internal keyboard
+    keysOfInterest(environment.internal_kbd_i, KbName('ESCAPE'))=1; % internal
+    
+    % external keyboard or grips
+    keysOfInterest(environment.external_kbd_i, KbName('a'))=1;
+    keysOfInterest(environment.external_kbd_i, KbName('b'))=1;
+    keysOfInterest(environment.external_kbd_i, KbName('c'))=1;
+    keysOfInterest(environment.external_kbd_i, KbName('d'))=1;
+    
+    % trigger
+    keysOfInterest(environment.trigger_kbd_i, KbName('t'))=1;
+    
+    environment.keysOfInterest = keysOfInterest;
     environment.productNames = productNames;
     white = WhiteIndex(max(screenNumbers));
-    black = BlackIndex(max(screenNumbers)); 
+    black = BlackIndex(max(screenNumbers));
     gray = round((white + black)/2);
     environment.color.white = [white white white];
     environment.color.black = [black black black];

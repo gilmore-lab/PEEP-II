@@ -22,28 +22,35 @@ for k=1:length(keyboardIndices)
 end
 fprintf('\n');
 
-internal_kbd = 1;
-switch length(keyboardIndices)
-    case 1
-        external_kbd = 1;
-    case 2
-        external_kbd = 2;
-    otherwise
-        external_kbd = 3;
+for k = 1:length(keyboardIndices)
+    switch char(productNames(k))
+        case 'Apple Internal Keyboard / Trackpad'
+            environment.internal_kbd_i = k;
+            environment.internal_kbd_index = keyboardIndices(k);
+            if length(keyboardIndices) == 1
+                environment.external_kbd_i = k;
+                environment.external_kbd_index = keyboardIndices(k);
+            end
+        case 'KeyWarrior8 Flex'
+            environment.external_kbd_i = k;
+            environment.external_kbd_index = keyboardIndices(k);
+        case 'TRIGI-USB'
+            environment.trigger_kbd_i = k;
+            environment.trigger_kbd_index = keyboardIndices(k);
+        case 'Apple External Keyboard'
+            environment.external_kbd_i = k;
+            environment.trigger_kbd_i = k;
+            environment.external_kbd_index = keyboardIndices(k);
+            environment.trigger_kbd_index = keyboardIndices(k);
+    end
 end
 
-% if length(keyboardIndices) <= 1
-%     external_kbd = 1;
-% else
-%     external_kbd = 3;
-% end
+test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
 
-test_keys(keyboardIndices(internal_kbd), char(productNames(internal_kbd)), 'ESCAPE', 'ESCAPE');
-
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'b', 'left index');
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'a', 'left thumb');
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'c', 'right index');
-test_keys(keyboardIndices(external_kbd), char(productNames(external_kbd)), 'd', 'right thumb');
+test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'b', 'left index');
+test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'a', 'left thumb');
+test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'c', 'right index');
+test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'd', 'right thumb');
 end
 
 function test_keys(kbdIndex, kbd_name, key_returned, key_label)

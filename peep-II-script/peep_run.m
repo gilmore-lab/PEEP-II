@@ -32,9 +32,11 @@ try
     Screen('Preference', 'SkipSyncTests', 1);
     win_ptr = Screen('OpenWindow', max(environment.screenNumbers));
     txt_2_screen('Welcome to PEEP', win_ptr, environment);
+    HideCursor;
 catch
     Screen('CloseAll');
     psychrethrow(psychlasterror);
+    ShowCursor;
 end
 
 % Load run and order data from file into cell array of filenames
@@ -370,7 +372,8 @@ catch
     psychrethrow(psychlasterror);
     diary off;
     fclose('all');
-    Screen('CloseAll');t
+    Screen('CloseAll');
+    ShowCursor;
 end
 
 PsychPortAudio('Close', pahandle);
