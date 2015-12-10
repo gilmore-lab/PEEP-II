@@ -5,6 +5,7 @@ function environment = set_peep_environment
 % 2015-11 Rick Gilmore wrote
 
 % 2015-11-16 rog added locale switching.
+% 2015-12-10 rog automatic mapping of USB inputs.
 %--------------------------------------------------------------------------
 
 % Clear if already in workspace
@@ -70,7 +71,7 @@ try
             case 'TRIGI-USB'
                 environment.trigger_kbd_i = k;
                 environment.trigger_kbd_index = keyboardIndices(k);
-            case 'Apple External Keyboard'
+            case 'Apple Keyboard'
                 environment.external_kbd_i = k;
                 environment.trigger_kbd_i = k;
                 environment.external_kbd_index = keyboardIndices(k);
@@ -82,16 +83,16 @@ try
     keysOfInterest=zeros(kbds,256); % make kbds x 256 array, then index
     
     % internal keyboard
-    keysOfInterest(environment.internal_kbd_i, KbName('ESCAPE'))=1; % internal
+    keysOfInterest(1, KbName('ESCAPE'))=1; % internal
     
     % external keyboard or grips
-    keysOfInterest(environment.external_kbd_i, KbName('a'))=1;
-    keysOfInterest(environment.external_kbd_i, KbName('b'))=1;
-    keysOfInterest(environment.external_kbd_i, KbName('c'))=1;
-    keysOfInterest(environment.external_kbd_i, KbName('d'))=1;
+    keysOfInterest(2, KbName('a'))=1;
+    keysOfInterest(2, KbName('b'))=1;
+    keysOfInterest(2, KbName('c'))=1;
+    keysOfInterest(2, KbName('d'))=1;
     
     % trigger
-    keysOfInterest(environment.trigger_kbd_i, KbName('t'))=1;
+    keysOfInterest(3, KbName('t'))=1;
     
     environment.keysOfInterest = keysOfInterest;
     environment.productNames = productNames;
@@ -112,7 +113,7 @@ environment.particip_text_color = environment.color.midblue;
 environment.particip_text_size = 50;
 environment.fix_color = environment.color.midblue;
 environment.circle_rect = [0 0 300 300];
-environment.circle_linewidth = 10;
+environment.circle_linewidth = 30;
 environment.dot_rect = [0 0 50 50];
 
 return

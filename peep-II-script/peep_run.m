@@ -1,4 +1,4 @@
-function peep_ratings(session, environment)
+function peep_run(session, environment)
 % peep_ratings(session, environment)
 %   Controls a particular run of the PEEP-II ratings experiment.
 %
@@ -10,6 +10,7 @@ function peep_ratings(session, environment)
 % 2015-11-16 rog added separate keyboard detection.
 % 2015-11-18 rog added switch b/w keyboard detection modes
 % 2015-12-03 add 10s sound at beginning, 6s at end, fix orders 3 and 4.
+% 2015-12-10 rog fixed automatic mapping of USB inputs.
 %--------------------------------------------------------------------------
 
 if (nargin < 2)
