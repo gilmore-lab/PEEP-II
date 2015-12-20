@@ -1,15 +1,22 @@
 function pre_scan_check(fam_id, nov_id)
-% pre_scan_check(fam_id, nov_id)
+% pre_scan_check(fam_id, nov_id, laptop_only)
 %   Checks status of localization, sound files, keyboards prior to scan.
+%   Default (no input params) presumes user wants to test laptop keyboard
+%   only.
+%   To test specific sound files for a given study and the SLEIC scanner
+%   trigger, grips, and laptop keyboard, enter parameters for fam_id,
+%   nov_id and laptop only as in pre_scan_check('0001','0003', 0)
 
 % 2015-11 Rick Gilmore
 
 % 2015-11-05 rog modified.
 % 2015-11-16 rog added localize_peep, keyboard check.
 % 2015-12-01 rog added sound test loop.
+% 2015-12-10 rog made test of single laptop keyboard the default.
+% 2015-12-20 rog modified
 %--------------------------------------------------------------------------
 
-if nargin < 2
+if nargin < 1
     fam_id = '9999';
     nov_id = '9998';
     fprintf('Familiar and novel IDs not specified. Using defaults: fam %s, nov %s.\n', fam_id, nov_id);
@@ -114,5 +121,6 @@ end
 
 PsychPortAudio('Close', pahandle);
 Screen('CloseAll');
+clc;
 
 end

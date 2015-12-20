@@ -11,6 +11,7 @@ function peep_run(session, environment)
 % 2015-11-18 rog added switch b/w keyboard detection modes
 % 2015-12-03 add 10s sound at beginning, 6s at end, fix orders 3 and 4.
 % 2015-12-10 rog fixed automatic mapping of USB inputs.
+% 2015-12-20 rog tweaked console output, added internal kbd 't' detection.
 %--------------------------------------------------------------------------
 
 if (nargin < 2)
@@ -334,10 +335,10 @@ while 1
         
         % Silence over? Then start new sound.
         if (GetSecs() > sil_end)
-%         if (GetSecs()-sil_start) > environment.silence_secs
             silence = 0;
             snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
-            peep_log_msg(sprintf('Snd : Silence duration %07.3f s. Started sound %i of %i: %s.\n', snd_start_time-sil_start, snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
+            peep_log_msg(sprintf('Snd : Silence duration %07.3f s.\n', snd_start_time-sil_start), start_secs, environment.log_fid);
+            peep_log_msg(sprintf('Snd : Started sound %i of %i: %s.\n',snd_index-1, n_snds, char(this_run_data.File(snd_index-1))), start_secs, environment.log_fid); 
             write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_on', environment.csv_fid);
             sil_start = GetSecs() + 12;
         end

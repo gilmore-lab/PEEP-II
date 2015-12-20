@@ -1,4 +1,4 @@
-function [ keyboardIndices, productNames ] = device_report
+function [ keyboardIndices, productNames ] = device_report()
 % [ keyboardIndices, productNames ] = device_report
 %   Reports on and prompts testing of keyboard devices
 %
@@ -12,6 +12,7 @@ function [ keyboardIndices, productNames ] = device_report
 
 % 2015-11-13 rog wrote
 % 2015-11-16 rog fixed Nordic NeuroLabs indexing.
+% 2015-12-20 rog modified. 't' now detected by internal keyboard.
 %--------------------------------------------------------------------------
 
 [keyboardIndices, productNames, ~] = GetKeyboardIndices();
@@ -22,6 +23,8 @@ for k=1:length(keyboardIndices)
 end
 fprintf('\n');
 
+
+% Assigns 
 for k = 1:length(keyboardIndices)
     switch char(productNames(k))
         case 'Apple Internal Keyboard / Trackpad'
@@ -45,12 +48,26 @@ for k = 1:length(keyboardIndices)
     end
 end
 
-test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
-
-test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'b', 'left index');
-test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'a', 'left thumb');
-test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'c', 'right index');
-test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'd', 'right thumb');
+if (length(keyboardIndices)==1)
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
+    
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'b', 'left index');
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'a', 'left thumb');
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'c', 'right index');
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'd', 'right thumb');
+    
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 't', 'scanner trigger');
+else
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
+    
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 't', 'scanner trigger');
+    
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'b', 'left index');
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'a', 'left thumb');
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'c', 'right index');
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'd', 'right thumb');
+end
+clc;
 end
 
 function test_keys(kbdIndex, kbd_name, key_returned, key_label)

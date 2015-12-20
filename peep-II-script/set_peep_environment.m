@@ -84,6 +84,7 @@ try
     
     % internal keyboard
     keysOfInterest(1, KbName('ESCAPE'))=1; % internal
+    keysOfInterest(1, KbName('t'))=1; % trigger
     
     % external keyboard or grips
     keysOfInterest(2, KbName('a'))=1;
