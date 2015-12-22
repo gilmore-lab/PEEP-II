@@ -23,7 +23,6 @@ for k=1:length(keyboardIndices)
 end
 fprintf('\n');
 
-
 % Assigns 
 for k = 1:length(keyboardIndices)
     switch char(productNames(k))
@@ -48,24 +47,26 @@ for k = 1:length(keyboardIndices)
     end
 end
 
+% Assumes that with single keyboard, all relevant keys should be detected
+% by the internal keyboard. Otherwise, the 't', and 'ESCAPE' keys are
+% detected by the internal keyboard, and the 'a', 'b', 'c', 'd', and 't', keys
+% are detected by the external keyboard.
 if (length(keyboardIndices)==1)
     test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
-    
     test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'b', 'left index');
     test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'a', 'left thumb');
     test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'c', 'right index');
-    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'd', 'right thumb');
-    
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'd', 'right thumb');    
     test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 't', 'scanner trigger');
 else
-    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');
-    
-    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 't', 'scanner trigger');
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 'ESCAPE', 'ESCAPE');    
+    test_keys(keyboardIndices(environment.internal_kbd_i), char(productNames(environment.internal_kbd_i)), 't', 'manual start');
     
     test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'b', 'left index');
     test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'a', 'left thumb');
     test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'c', 'right index');
-    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'd', 'right thumb');
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 'd', 'right thumb');    
+    test_keys(keyboardIndices(environment.external_kbd_i), char(productNames(environment.external_kbd_i)), 't', 'scanner trigger');
 end
 clc;
 end

@@ -59,7 +59,6 @@ InitializePsychSound;
 try
     % Try with the frequency we want
     pahandle = PsychPortAudio('Open', [], [], 0, snd_freq, nrchannels);
-%     PsychPortAudio('FillBuffer', pahandle, this_snd);
 catch
     % Failed. Retry with default frequency as suggested by device:
     fprintf('\nCould not open device at wanted playback frequency of %i Hz. Will retry with device default frequency.\n', snd_freq);
@@ -123,6 +122,12 @@ while 1
     [pressed, firstPress] = KbQueueCheck(environment.internal_kbd_index);
     timeSecs = firstPress(find(firstPress));
     if pressed
+        if firstPress(environment.tKey)
+            n_pulses_detected = n_pulses_detected + 1;
+            run_start_time = start_secs;
+            peep_log_msg(sprintf('Non : Manual start detected.\n', n_pulses_detected), start_secs, environment.log_fid);
+            write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid); 
+        end
         if firstPress(environment.escapeKey)            
             peep_log_msg(sprintf('Non : Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
             break;

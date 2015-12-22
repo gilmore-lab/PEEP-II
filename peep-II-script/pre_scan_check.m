@@ -92,7 +92,7 @@ end
 [keyboardIndices, ~, ~] = GetKeyboardIndices();
 try
     KbReleaseWait;
-    fprintf('Press any key to START playing test sounds.\n');
+    fprintf('Press any key on laptop keyboard to START playing test sounds.\n');
     KbStrokeWait;
     fprintf('Sound starting.\n');
     PsychPortAudio('Start', pahandle, 1, 0, 1);
