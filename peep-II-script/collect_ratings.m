@@ -55,6 +55,7 @@ peep_log_msg(sprintf('Initializing run %s, order %s for participant %s. Unfamili
 session.this_run_data = create_run_file_list(environment, session);
 session.n_snds = height(session.this_run_data);
 
+% Initialize ratings matrix
 session.ratings = zeros(session.n_snds,6); % initialize rating matrix
 
 % Load first sound file since there is no silent period to start
@@ -84,10 +85,6 @@ KbReleaseWait;
 txt_2_screen('Press any key to start ratings.\n', environment.win_ptr, environment);
 KbStrokeWait;
 
-% % Create and start Kb queues
-% KbQueueCreate(environment.internal_kbd_index, environment.keysOfInterest);
-% KbQueueStart(environment.internal_kbd_index);        
-
 % Initialize status
 status.continue = 1;
 status.play = 0;
@@ -99,7 +96,6 @@ status.ratings_finished = 0;
 while status.continue
     [ status, session ] = handle_keypress(session, environment, status);
     update_screen(session, environment, status);
-    WaitSecs(environment.interkey_secs); % space between keypress detections.
 end % while
 
 % All done screen
@@ -110,7 +106,7 @@ catch
     psychrethrow(psychlasterror);
     diary off;
     fclose('all');
-    Screen('CloseAll');t
+    Screen('CloseAll');
 end % try
 
 end

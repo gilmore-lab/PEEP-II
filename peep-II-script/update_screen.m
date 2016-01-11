@@ -17,7 +17,7 @@ try
     Screen('TextFont', env.win_ptr, 'Courier New');
     Screen('TextSize', env.win_ptr, env.particip_text_size);
     Screen('TextStyle', env.win_ptr, 1+2);
-    msg_text = sprintf('Rating sound %i of %i', status.snd_index, session.n_snds);
+    msg_text = sprintf('%s / %s : Run %s : Order %s : Snd %i of %i', char(session.this_family), char(session.nov_family), char(session.run), char(session.order), status.snd_index, session.n_snds);
     DrawFormattedText(env.win_ptr, msg_text, 'center', 0, env.particip_text_color);
 catch
     Screen('CloseAll');
@@ -38,6 +38,7 @@ catch
     psychrethrow(psychlasterror);
 end
 
+% Face/icons
 wrect = env.scrns(1).rect;
 [~, cy] = RectCenter(wrect);
 rect_x = wrect(3);
@@ -72,6 +73,7 @@ if (status.rating_index <= 4) & (status.rating_index > 0)
     end
 end
 
+% Yes/No check/X
 if (status.rating_index == 5)
     wrect = env.scrns(1).rect;
     [~, cy] = RectCenter(wrect);

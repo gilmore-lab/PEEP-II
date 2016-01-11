@@ -32,6 +32,7 @@ fprintf('Loaded default session.\n\n');
 % Get session data for this run
 session = get_peep_session_data(session, environment);
 
+
 % Create run-specific log file
 log_fn = strcat('log/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.log');
 [log_fid, ~] = fopen(log_fn, 'w');
@@ -39,7 +40,7 @@ peep_log_msg('Opened log file: log_fn\n', GetSecs(), log_fid);
 environment.log_fid = log_fid;
 
 % Create run-specific event file
-csv_fn = strcat('csv/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
+csv_fn = strcat('csv/', 'mri-', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
 peep_log_msg('Opened csv file: %s\n', GetSecs(), csv_fid);
 fprintf(csv_fid, 'date_time,secs_from_start,vis_ring,snd_playing,mri_vol,event_type\n');

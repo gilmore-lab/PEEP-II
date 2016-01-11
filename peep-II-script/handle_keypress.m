@@ -8,6 +8,8 @@ function [ status, session ] = handle_keypress(session, environment, status)
 
 % 2015-12-23 rog modified
 % 2015-12-29 rog debugged up/down arrow, left/right keypress, ESCAPE, SPACE
+% 2016-01-11 rog tweaked behavior when reaching end of sounds, writing data
+%               to file
 %--------------------------------------------------------------------------
 
 [pressed, ~, firstPress, ~] = KbCheck(environment.internal_kbd_index);
@@ -20,11 +22,11 @@ if pressed
     if firstPress(environment.spaceKey) % Play/stop sound
         snd_status = PsychPortAudio('GetStatus', session.pahandle);
         if snd_status.Active
-            fprintf('Stop sound.\n');
+            fprintf('Stopping sound.\n');
             status.play = 0;
             PsychPortAudio('Stop', session.pahandle, 1, 0, 1);
         else
-            fprintf('Start sound.\n');
+            fprintf('Starting sound.\n');
             status.play = 1;
             PsychPortAudio('Start', session.pahandle, 1, 0, 1);
         end % if snd_status
@@ -60,6 +62,7 @@ if pressed
         if (status.rating_index + 1 > 6)
             % Load next sound, should indicate change somehow
             if (status.snd_index + 1 <= session.n_snds)
+                write_rating_data(status, session, environment);
                 fprintf('Switching to sound %i.\n', status.snd_index);
                 status.snd_index = status.snd_index + 1;
                 [this_snd, ~, ~] = load_peep_sound(session.this_run_data.File(status.snd_index));
@@ -67,7 +70,7 @@ if pressed
                 status.highlighted_index = 1;
                 status.rating_index = 0;
             else
-                status.ratings_finished = 1;
+                status.continue = 0;
             end % if (status.snd_index
         else
             status.rating_index = status.rating_index + 1;
@@ -100,4 +103,5 @@ if pressed
         end
         status.highlighted_index = 1; % return to default
     end
+    KbReleaseWait;
 end
