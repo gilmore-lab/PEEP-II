@@ -32,6 +32,8 @@ sad2 = imread('img/sad-2.jpg');
 sad3 = imread('img/sad-3.jpg');
 sad4 = imread('img/sad-4.jpg');
 neu1 = imread('img/ang-1.jpg');
+yesImg = imread('img/yes-crop.jpg');
+noImg = imread('img/no-crop.jpg');
 
 % Make textures
 angTex1 = Screen('MakeTexture', env.win_ptr, ang1);
@@ -50,6 +52,9 @@ feelTex1 = Screen('MakeTexture', env.win_ptr, hap1); % neutral
 feelTex2 = Screen('MakeTexture', env.win_ptr, hap3); % mid happy
 feelTex3 = Screen('MakeTexture', env.win_ptr, ang3); % mid angry
 feelTex4 = Screen('MakeTexture', env.win_ptr, sad3); % mid sad
+
+yesTex = Screen('MakeTexture', env.win_ptr, yesImg);
+noTex = Screen('MakeTexture', env.win_ptr, noImg);
 
 % Copy to data structure
 env.face(1).intensity(1) = hapTex1;
@@ -71,6 +76,8 @@ env.face(4).intensity(1) = feelTex1;
 env.face(4).intensity(2) = feelTex2;
 env.face(4).intensity(3) = feelTex3;
 env.face(4).intensity(4) = feelTex4;
+env.yesImg = yesTex;
+env.noImg = noTex;
 
 return
 

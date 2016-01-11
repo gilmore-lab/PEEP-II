@@ -48,10 +48,10 @@ for k = 1:length(keyboardIndices)
             keys_to_test = {'t', 'a', 'b', 'c', 'd', 'ESCAPE'};
             key_names = keys_to_test;
             test_keys(kbd_index, prod_name, keys_to_test, key_names)
-%         case 'Dell xxx' % may not be needed, but fragment here in case
-%             keys_to_test = {'t', 'a', 'b', 'c', 'd', 'ESCAPE'};
-%             key_names = keys_to_test;
-%             test_keys(kbd_index, prod_name, keys_to_test, key_names)
+        case 'Dell USB Entry Keyboard' % may not be needed, but fragment here in case
+            keys_to_test = {'t', 'a', 'b', 'c', 'd', 'ESCAPE'};
+            key_names = keys_to_test;
+            test_keys(kbd_index, prod_name, keys_to_test, key_names)
     end % switch
 end % for k
 

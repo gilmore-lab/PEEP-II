@@ -2,7 +2,6 @@ function peep_ratings
 %peep_ratings
 %
 % 
-% cd('~/github/gilmore-lab/peep-II/script-ratings/matlab');
 
 % Start diary
 diary(sprintf('diary/%s-diary.txt', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF')));
@@ -43,7 +42,7 @@ environment.log_fid = log_fid;
 csv_fn = strcat('csv/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
 peep_log_msg('Opened csv file: %s\n', GetSecs(), csv_fid);
-fprintf(csv_fid, 'date_time,secs_from_start,vis_ring,snd_playing,mri_vol,event_type\n');
+fprintf(csv_fid, 'fam_id,nov_id,run,order,sound_index,snd_file,happy_rating,angry_rating,sad_rating,how_feel,know_speaker\n');
 environment.csv_fid = csv_fid;
 
 collect_ratings(session, environment);
@@ -57,5 +56,6 @@ KbStrokeWait;
 diary off;
 fclose('all');
 Screen('CloseAll');
+clc; % To clear buffer
 end
 

@@ -106,13 +106,21 @@ end
 [keyboardIndices, ~, ~] = GetKeyboardIndices();
 try
     KbReleaseWait;
-    fprintf('Press any key on laptop keyboard to START playing test sounds.\n');
-    KbStrokeWait;
+    fprintf('Press TAB key on laptop keyboard to START playing test sounds.\n');
+    while 1
+        [ keyIsDown, timeSecs, keyCode ] = KbCheck(keyboardIndices);
+        if keyIsDown
+            if keyCode(KbName('TAB'))
+                break;
+            end
+            KbReleaseWait;
+        end
+    end
     fprintf('Sound starting.\n');
     PsychPortAudio('Start', pahandle, 1, 0, 1);
     snd_status = PsychPortAudio('GetStatus', pahandle);
     if snd_status.Active
-        fprintf('Press any key to STOP playing sounds.\n');
+        fprintf('Press TAB key to STOP playing sounds.\n');
     else
         fprintf('Sound did not start.\n');
         return;
@@ -122,9 +130,12 @@ try
         if ~snd_status.Active
             PsychPortAudio('Start', pahandle, 1, 0, 1);
         end
-        [keyIsDown, ~, ~, ~] = KbCheck(keyboardIndices(1));
+        [keyIsDown, ~, ~, ~] = KbCheck(keyboardIndices);
         if keyIsDown
-            break;
+            if keyCode(KbName('TAB'))
+                break;
+            end
+            KbReleaseWait;
         end        
     end
     fprintf('Sound stopped.\n');

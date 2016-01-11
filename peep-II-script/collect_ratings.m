@@ -55,11 +55,12 @@ peep_log_msg(sprintf('Initializing run %s, order %s for participant %s. Unfamili
 session.this_run_data = create_run_file_list(environment, session);
 session.n_snds = height(session.this_run_data);
 
-% Load first sound file since there is no silent period to start
+session.ratings = zeros(session.n_snds,6); % initialize rating matrix
 
-session.snd_index = 1;
-peep_log_msg(sprintf('Loading sound %i of %i sounds: %s.\n\n', session.snd_index, session.n_snds, char(session.this_run_data.File(session.snd_index))), GetSecs(), environment.log_fid);
-[this_snd, snd_freq, nrchannels] = load_peep_sound(session.this_run_data.File(session.snd_index));
+% Load first sound file since there is no silent period to start
+status.snd_index = 1;
+peep_log_msg(sprintf('Loading sound %i of %i sounds: %s.\n\n', status.snd_index, session.n_snds, char(session.this_run_data.File(status.snd_index))), GetSecs(), environment.log_fid);
+[this_snd, snd_freq, nrchannels] = load_peep_sound(session.this_run_data.File(status.snd_index));
 
 % Perform basic initialization of the sound driver:
 InitializePsychSound;
@@ -91,15 +92,14 @@ KbStrokeWait;
 status.continue = 1;
 status.play = 0;
 status.highlighted_index = 1;
-status.rating_index = 1;
-status.snd_index = 1;
+status.rating_index = 0; % At start of rating
 status.ratings_finished = 0;
 
 % Then loop for other sounds
 while status.continue
-    status = handle_keypress(session, environment, status);
+    [ status, session ] = handle_keypress(session, environment, status);
     update_screen(session, environment, status);
-    WaitSecs(.1); % space between keypress detections.
+    WaitSecs(environment.interkey_secs); % space between keypress detections.
 end % while
 
 % All done screen

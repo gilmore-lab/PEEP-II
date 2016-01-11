@@ -33,6 +33,7 @@ environment.aKey = KbName('a');
 environment.bKey = KbName('b');
 environment.cKey = KbName('c');
 environment.dKey = KbName('d');
+environment.tabKey = KbName('TAB');
 
 % Timing parameters
 environment.circle_chg_min_secs = 1.5; % 1.5 s from start of sound or silence
@@ -72,6 +73,11 @@ try
                 environment.trigger_kbd_i = k;
                 environment.trigger_kbd_index = keyboardIndices(k);
             case 'Apple Keyboard'
+                environment.external_kbd_i = k;
+                environment.trigger_kbd_i = k;
+                environment.external_kbd_index = keyboardIndices(k);
+                environment.trigger_kbd_index = keyboardIndices(k);
+            case 'Dell USB Entry Keyboard'
                 environment.external_kbd_i = k;
                 environment.trigger_kbd_i = k;
                 environment.external_kbd_index = keyboardIndices(k);

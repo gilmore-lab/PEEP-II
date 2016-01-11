@@ -28,6 +28,8 @@ end
 environment.root_dir = 'peep-II-ratings';
 environment.run_orders_dir = 'run-orders';
 
+environment.interkey_secs = .1;
+
 % Keys
 environment.tKey = KbName('t');
 environment.escapeKey = KbName('ESCAPE');
@@ -36,7 +38,7 @@ environment.bKey = KbName('b');
 environment.cKey = KbName('c');
 environment.dKey = KbName('d');
 environment.spaceKey = KbName('SPACE');
-environment.enterKey = KbName('ENTER');
+environment.enterKey = 40;
 environment.tabKey = KbName('TAB');
 environment.leftArrowKey = KbName('LeftArrow');
 environment.rightArrowKey = KbName('RightArrow');
@@ -67,6 +69,7 @@ try
     environment.color.black = [black black black];
     environment.color.gray = [gray gray gray];
     environment.color.midblue = [0 0 127];
+    environment.color.midred = [127 0 0];
 catch
     Screen('CloseAll');
     psychrethrow(psychlasterror);

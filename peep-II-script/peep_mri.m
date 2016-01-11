@@ -48,9 +48,20 @@ environment.csv_fid = csv_fid;
 % Run experiment
 peep_run(session, environment);
  
-KbReleaseWait;
-peep_log_msg(sprintf('Press any key to clear participant screen and end study.\n\n'), GetSecs(), environment.log_fid);
-KbStrokeWait;
+% KbReleaseWait;
+peep_log_msg(sprintf('Press ESCAPE to clear participant screen and end study.\n\n'), GetSecs(), environment.log_fid);
+% KbStrokeWait;
+
+[keyboardIndices, ~, ~] = GetKeyboardIndices();
+while 1
+    [ keyIsDown, timeSecs, keyCode ] = KbCheck(keyboardIndices);
+    if keyIsDown
+        if keyCode(KbName('ESCAPE'))
+            break;
+        end
+        KbReleaseWait;
+    end
+end
 
 % Clean-up
 diary off;
