@@ -20,6 +20,7 @@ function pre_scan_check(fam_id, nov_id)
 % 2015-12-10 rog made test of single laptop keyboard the default.
 % 2015-12-20 rog modified
 % 2015-12-29 rog tweaked console messages, documentation, device_report.m
+% 2016-01-13 rog fixed TAB detection for sound end.
 %--------------------------------------------------------------------------
 
 if nargin < 1
@@ -119,20 +120,23 @@ try
     fprintf('Sound starting.\n');
     PsychPortAudio('Start', pahandle, 1, 0, 1);
     snd_status = PsychPortAudio('GetStatus', pahandle);
+    
     if snd_status.Active
         fprintf('Press TAB key to STOP playing sounds.\n');
     else
         fprintf('Sound did not start.\n');
         return;
     end
+    
     while 1
         snd_status = PsychPortAudio('GetStatus', pahandle);
         if ~snd_status.Active
             PsychPortAudio('Start', pahandle, 1, 0, 1);
         end
-        [keyIsDown, ~, ~, ~] = KbCheck(keyboardIndices);
+        [keyIsDown, ~, keyCode, ~] = KbCheck(keyboardIndices);
         if keyIsDown
             if keyCode(KbName('TAB'))
+                fprintf('Pressed %s key.\n', KbName(keyCode));
                 break;
             end
             KbReleaseWait;
@@ -146,6 +150,6 @@ end
 
 PsychPortAudio('Close', pahandle);
 Screen('CloseAll');
-clc;
+%clc;
 
 end
