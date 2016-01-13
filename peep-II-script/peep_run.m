@@ -47,7 +47,9 @@ peep_log_msg(sprintf('Non : Initializing run %s, order %s for participant %s. Un
 this_run_data = create_run_file_list(environment, session);
 
 % Load first sound file since there is no silent period to start
+% snd_index = 1;
 snd_index = 1;
+next_snd = 1;
 n_snds = height(this_run_data);
 peep_log_msg(sprintf('Non : Loading sound %i of %i sounds: %s.\n\n', snd_index, n_snds, char(this_run_data.File(snd_index))), GetSecs(), environment.log_fid);
 [this_snd, snd_freq, nrchannels] = load_peep_sound(this_run_data.File(snd_index));
@@ -85,6 +87,24 @@ end
 % Wait for scanner trigger
 peep_log_msg(sprintf('Non : Ready to run. Start scanner. Script will start automatically on first non-DISDAQ pulse.\n'), GetSecs(), environment.log_fid);
 n_pulses_detected = 0;
+while 1
+    [ keyIsDown, timeSecs, keyCode ] = KbCheck(keyboardIndices);
+    start_secs = timeSecs;
+    if keyIsDown
+        if keyCode(environment.tKey)
+            n_pulses_detected = n_pulses_detected + 1;
+            run_start_time = timeSecs;
+            peep_log_msg(sprintf('Non : Scanner pulse %i detected. Starting. \n', n_pulses_detected), start_secs, environment.log_fid);
+            write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid);
+            break;
+        end % if keyCode
+        KbReleaseWait;
+        if keyCode(environment.escapeKey)
+            peep_log_msg(sprintf('Non : Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
+            break;
+        end
+    end % keyIsDown
+end
 
 % Create and start Kb queues
 switch environment.kbds
@@ -113,32 +133,14 @@ switch environment.kbds
         KbQueueCreate(environment.internal_kbd_index, keysOfInterest);
         KbQueueStart(environment.internal_kbd_index);
 end % switch
-
-while 1
-    [ keyIsDown, timeSecs, keyCode ] = KbCheck(keyboardIndices);
-    start_secs = timeSecs;
-    if keyIsDown
-        if keyCode(environment.tKey)
-            n_pulses_detected = n_pulses_detected + 1;
-            run_start_time = timeSecs;
-            peep_log_msg(sprintf('Non : Scanner pulse %i detected. Starting. \n', n_pulses_detected), start_secs, environment.log_fid);
-            write_event_2_file(start_secs, 'none', 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid);
-            break;
-        end % if keyCode
-        KbReleaseWait;
-        if keyCode(environment.escapeKey)
-            peep_log_msg(sprintf('Non : Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
-            break;
-        end
-    end % keyIsDown
-end
-
 KbEventFlush(environment.internal_kbd_index);
+KbEventFlush(environment.external_kbd_index);
 KbEventFlush(environment.trigger_kbd_index);
 
 % Show fixation, prepare to enter trial loop
 big_circle = 0;
 silence = 0;
+snd_index = 0;
 fix_2_screen(big_circle, win_ptr, environment);
 change_secs = start_secs + environment.silence_secs + environment.extra_silence + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
 peep_log_msg(sprintf('Sil : Fix -. Change at %07.3f.\n', change_secs-start_secs), start_secs, environment.log_fid);
@@ -302,22 +304,26 @@ while 1
             % Start silent period
             sil_start = GetSecs();
             silence = 1;
-            if snd_index == 1 % first silence
+            if snd_index == 0 % first silence
                 sil_end = sil_start + environment.silence_secs + environment.extra_silence;
-                peep_log_msg(sprintf('Sil : Intro silence, end at %07.3f.\n', sil_end-start_secs), start_secs, environment.log_fid);
+                peep_log_msg(sprintf('Sil : Intro silence, end at %07.3f.\n', sil_end-start_secs), start_secs, environment.log_fid);               
             else
                 sil_end = sil_start + environment.silence_secs;
                 peep_log_msg(sprintf('Sil : Sound duration %07.3f s.\n', sil_start-snd_start_time), start_secs, environment.log_fid);
             end
             write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_off', environment.csv_fid);
             
-            % Load next
+            % if not end, load next sound
             next_snd = snd_index + 1;
-            peep_log_msg(sprintf('Sil : Loading sound %i of %i : %s.\n', next_snd, n_snds, char(this_run_data.File(next_snd))), start_secs, environment.log_fid);
-            [this_snd, ~, ~] = load_peep_sound(this_run_data.File(next_snd));
-            PsychPortAudio('FillBuffer', pahandle, this_snd, [], 0);
-            
-            %snd_index = snd_index + 1;
+            if next_snd <= n_snds
+                peep_log_msg(sprintf('Sil : Loading sound %i of %i : %s.\n', next_snd, n_snds, char(this_run_data.File(next_snd))), start_secs, environment.log_fid);
+                [this_snd, ~, ~] = load_peep_sound(this_run_data.File(next_snd));
+                PsychPortAudio('FillBuffer', pahandle, this_snd, [], 0);
+                snd_index = next_snd;
+            else
+                peep_log_msg(sprintf('Sil : Last sound finished.\n'), start_secs, environment.log_fid);
+                break;
+            end
         end % if ~silence
         
         % Change circle?
@@ -337,17 +343,16 @@ while 1
             end
         end % if (GetSecs()
         
-        % Silence over? Then start new sound.
+        % Silence over? Then start new sound if not at end
         if (GetSecs() > sil_end)
             silence = 0;
             snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
             snd_index = next_snd;
             peep_log_msg(sprintf('Snd : Silence duration %07.3f s.\n', snd_start_time-sil_start), start_secs, environment.log_fid);
-            peep_log_msg(sprintf('Snd : Started sound %i of %i: %s.\n',snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
+            peep_log_msg(sprintf('Snd : Started sound %i of %i: %s.\n', snd_index, n_snds, char(this_run_data.File(snd_index))), start_secs, environment.log_fid);
             write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'sound_on', environment.csv_fid);
             sil_start = GetSecs() + 12; % 10 s sound + 2 s buffer from start
         end
-        
     end % if snd_status.Active
     
     % Break from program if ESCAPE
