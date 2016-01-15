@@ -4,6 +4,13 @@ function peep_mri()
 
 % 2015-11 Rick Gilmore created
 
+% Dependencies
+%   Calls:
+%       set_mri_environment.m
+%       get_peep_session_data.m
+%       peep_log_msg.m
+%       peep_run.m
+
 % 2015-11 rog modified.
 % 2015-01-15 rog fixed write to csv file.
 %--------------------------------------------------------------------------
@@ -48,11 +55,9 @@ environment.csv_fid = csv_fid;
 
 % Run experiment
 peep_run(session, environment);
- 
-% KbReleaseWait;
-peep_log_msg(sprintf('Press ESCAPE to clear participant screen and end study.\n\n'), GetSecs(), environment.log_fid);
-% KbStrokeWait;
+peep_log_msg(sprintf('Sil : Press ESCAPE to clear participant screen and end study.\n'), GetSecs(), environment.log_fid);
 
+KbReleaseWait;
 [keyboardIndices, ~, ~] = GetKeyboardIndices();
 while 1
     [ keyIsDown, ~, keyCode ] = KbCheck(keyboardIndices);

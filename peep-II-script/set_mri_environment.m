@@ -52,6 +52,9 @@ environment.circle_chg_dur_secs = 1;   % 1 s duration
 environment.secs_btw_presses = .15;
 environment.secs_btw_pulses = environment.mri_TR * .95; % 95% of TR
 
+% messages
+environment.now_playing_msgs = {'Sil', 'Snd'};
+
 % Screen & keyboard parameters
 try
     screenNumbers = Screen('Screens');
