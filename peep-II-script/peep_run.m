@@ -256,7 +256,7 @@ while 1
                 [pressed, firstPress] = KbQueueCheck(environment.internal_kbd_index);
                 timeSecs = firstPress(find(firstPress));
                 if pressed
-                    peep_log_msg(sprintf('Sil: Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
+                    peep_log_msg(sprintf('Sil : Escape detected at %07.3f from start.\n', timeSecs-start_secs), start_secs, environment.log_fid);
                     break;
                 end
             case 2
@@ -293,7 +293,7 @@ while 1
                         peep_log_msg(sprintf('Sil : Scanner pulse %i detected.\n', n_pulses_detected), start_secs, environment.log_fid);
                         write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'new_mri_vol', environment.csv_fid);
                     else
-                        peep_log_msg(sprintf('Sil: Participant press.\n'), start_secs, environment.log_fid);
+                        peep_log_msg(sprintf('Sil : Participant press.\n'), start_secs, environment.log_fid);
                         write_event_2_file(start_secs, num2str(big_circle), 'silence', num2str(n_pulses_detected), 'keypress',environment.csv_fid);
                     end % if firstPress
                 end % if pressed

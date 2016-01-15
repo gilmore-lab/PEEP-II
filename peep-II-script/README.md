@@ -50,10 +50,11 @@ This is the MRI-study script for the PEEP-II study.
 
 - ```planning/```
     + Planning documents for file formats, etc.
-- ```beh/```
-    + Future home for key presses during MRI and other measures (script ratings?). nnnn-mri-sess-{1,2}.csv, etc.
+- ```csv/```
+    + csv-formatted data files for subsequent MRI and behavioral analysis.
+    + mri files named 'mri-9999-2016-01-15-0621-run-1-order-1.csv'
+    + date_time, secs_from_start, vis_ring, snd_playing, mri_vol, event_type
 - ```wav/```
-    + Directory for *.wav sound files. Contains subdirectories for each family <nnnn>/norm and <nnnn>/raw. The <nnnn>/norm directories contain the normalized sounds used in testing.
+    + Directory for .wav sound files. Contains subdirectories for each family <nnnn>/norm and <nnnn>/raw. The <nnnn>/norm directories contain the normalized sounds used in testing.
 - ```diary/```
     + Directory for diary files (Matlab console output). These are useful in debugging visual displays on single monitor systems.
- 

@@ -5,6 +5,7 @@ function peep_mri
 % 2015-11 Rick Gilmore created
 
 % 2015-11 rog modified.
+% 2015-01-15 rog fixed write to csv file.
 %--------------------------------------------------------------------------
 
 % Start diary
@@ -32,7 +33,6 @@ fprintf('Loaded default session.\n\n');
 % Get session data for this run
 session = get_peep_session_data(session, environment);
 
-
 % Create run-specific log file
 log_fn = strcat('log/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.log');
 [log_fid, ~] = fopen(log_fn, 'w');
@@ -42,7 +42,7 @@ environment.log_fid = log_fid;
 % Create run-specific event file
 csv_fn = strcat('csv/', 'mri-', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
-peep_log_msg('Opened csv file: %s\n', GetSecs(), csv_fid);
+peep_log_msg('Opened csv file: %s\n', GetSecs(), environment.log_fid);
 fprintf(csv_fid, 'date_time,secs_from_start,vis_ring,snd_playing,mri_vol,event_type\n');
 environment.csv_fid = csv_fid;
 
@@ -55,7 +55,7 @@ peep_log_msg(sprintf('Press ESCAPE to clear participant screen and end study.\n\
 
 [keyboardIndices, ~, ~] = GetKeyboardIndices();
 while 1
-    [ keyIsDown, timeSecs, keyCode ] = KbCheck(keyboardIndices);
+    [ keyIsDown, ~, keyCode ] = KbCheck(keyboardIndices);
     if keyIsDown
         if keyCode(KbName('ESCAPE'))
             break;
