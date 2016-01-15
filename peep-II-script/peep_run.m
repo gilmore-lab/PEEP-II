@@ -111,7 +111,7 @@ while 1
             status.n_pulses_detected = status.n_pulses_detected + 1;
             status.last_pulse = timeSecs;
             peep_log_msg(sprintf('%s : Scanner pulse %i detected. Starting. \n', status.now_playing, status.n_pulses_detected), status.start_secs, environment.log_fid);
-            write_event_2_file(status.start_secs, 'none', 'silence', num2str(status.n_pulses_detected), 'new_mri_vol', environment.csv_fid);
+            write_event_2_file(status.start_secs, 'none', status.curr_snd, num2str(status.n_pulses_detected), 'new_mri_vol', environment.csv_fid);
             break;
         end % if keyCode
         KbReleaseWait;
@@ -125,16 +125,17 @@ end
 % Show fixation, prepare to enter trial loop
 status.big_circle = 0;
 status.continue = 1;
-silence = 0;
-status.snd_on_off = 'snd_off';
+status.last_silence = 0;
 status.lastPress = status.start_secs;
-status.now_playing = status.now_playing;
+
+silence = 0;
 snd_index = 0;
 
+% Show initial fixation
 fix_2_screen(status.big_circle, win_ptr, environment);
 change_secs = status.start_secs + environment.silence_secs + environment.extra_silence + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
 peep_log_msg(sprintf('%s : Fix -. Change at %07.3f.\n', status.now_playing, change_secs-status.start_secs), status.start_secs, environment.log_fid);
-write_event_2_file(status.start_secs, num2str(status.big_circle), 'silence', num2str(status.n_pulses_detected), 'sound_off', environment.csv_fid);
+write_event_2_file(status.start_secs, num2str(status.big_circle), 'silence', num2str(status.n_pulses_detected), 'ring_off', environment.csv_fid);
 
 % Start sound loop
 while status.continue
@@ -159,14 +160,16 @@ while status.continue
             end % if status.big_circle
         end % if GetSecs()
     else % Sound over/not playing yet
-        status.now_playing = char(environment.now_playing_msgs(1));
-        status.curr_snd = 'silence';
-        
+%         status.now_playing = char(environment.now_playing_msgs(1));
+%         status.curr_snd = 'silence';
+       
         % If not silence yet, start
         if ~silence
             % Start silent period
             sil_start = GetSecs();
             silence = 1;
+            status.now_playing = char(environment.now_playing_msgs(1));
+            status.curr_snd = 'silence';
             if snd_index == 0 % first silence
                 sil_end = sil_start + environment.silence_secs + environment.extra_silence;
                 peep_log_msg(sprintf('%s : Intro silence, end at %07.3f.\n', status.now_playing, sil_end-status.start_secs), status.start_secs, environment.log_fid);               
@@ -175,7 +178,7 @@ while status.continue
                 peep_log_msg(sprintf('%s : Sound duration %07.3f s.\n', status.now_playing, sil_start-snd_start_time), status.start_secs, environment.log_fid);
             end % if snd_index
             write_event_2_file(status.start_secs, num2str(status.big_circle), status.curr_snd, num2str(status.n_pulses_detected), 'sound_off', environment.csv_fid);
-            
+
             % if not end, load next sound
             next_snd = snd_index + 1;
             if next_snd <= n_snds
@@ -186,7 +189,8 @@ while status.continue
             else
                 status.now_playing = char(environment.now_playing_msgs(1));
                 peep_log_msg(sprintf('%s : Last sound finished.\n', status.now_playing), status.start_secs, environment.log_fid);
-                break;
+                peep_log_msg(sprintf('%s : Last silent period starting.\n', status.now_playing), status.start_secs, environment.log_fid);
+                status.last_silence = 1;
             end % if next_snd 
         end % if ~silence
         
@@ -195,13 +199,13 @@ while status.continue
             if status.big_circle
                 status.big_circle = 0;
                 fix_2_screen(status.big_circle, win_ptr, environment);
-                write_event_2_file(status.start_secs, num2str(status.big_circle), char(this_run_data.File(snd_index)), num2str(status.n_pulses_detected), 'ring_off', environment.csv_fid);
+                write_event_2_file(status.start_secs, num2str(status.big_circle), status.curr_snd, num2str(status.n_pulses_detected), 'ring_off', environment.csv_fid);
                 change_secs = sil_end + rand(1)*(environment.circle_chg_max_secs-environment.circle_chg_min_secs) + environment.circle_chg_min_secs;
                 peep_log_msg(sprintf('%s : Fix -. Change at %07.3f.\n', status.now_playing, change_secs-status.start_secs), status.start_secs, environment.log_fid);
             else
                 status.big_circle = 1;
                 fix_2_screen(status.big_circle, win_ptr, environment);
-                write_event_2_file(status.start_secs, num2str(status.big_circle), char(this_run_data.File(snd_index)), num2str(status.n_pulses_detected), 'ring_on', environment.csv_fid);
+                write_event_2_file(status.start_secs, num2str(status.big_circle), status.curr_snd, num2str(status.n_pulses_detected), 'ring_on', environment.csv_fid);
                 change_secs = change_secs + environment.circle_chg_dur_secs;
                 peep_log_msg(sprintf('%s : Fix +. Change at %07.3f.\n', status.now_playing, change_secs-status.start_secs), status.start_secs, environment.log_fid);
             end
@@ -209,15 +213,19 @@ while status.continue
         
         % Silence over? Then start new sound if not at end
         if (GetSecs() > sil_end)
-            silence = 0;
-            snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
-            peep_log_msg(sprintf('%s : Silence duration %07.3f s.\n', status.now_playing, snd_start_time-sil_start), status.start_secs, environment.log_fid);
-            status.now_playing = char(environment.now_playing_msgs(2));
-            status.curr_snd = char(this_run_data.File(snd_index));
-            snd_index = next_snd;
-            peep_log_msg(sprintf('%s : Started sound %i of %i: %s.\n', status.now_playing, snd_index, n_snds, char(this_run_data.File(snd_index))), status.start_secs, environment.log_fid);
-            write_event_2_file(status.start_secs, num2str(status.big_circle), status.curr_snd, num2str(status.n_pulses_detected), 'sound_on', environment.csv_fid);
-            sil_start = GetSecs() + 12; % 10 s sound + 2 s buffer from start
+            if status.last_silence
+                break;
+            else
+                silence = 0;
+                snd_start_time = PsychPortAudio('Start', pahandle, 1, 0, 1);
+                peep_log_msg(sprintf('%s : Silence duration %07.3f s.\n', status.now_playing, snd_start_time-sil_start), status.start_secs, environment.log_fid);
+                status.now_playing = char(environment.now_playing_msgs(2));
+                status.curr_snd = char(this_run_data.File(snd_index));
+                snd_index = next_snd;
+                peep_log_msg(sprintf('%s : Started sound %i of %i: %s.\n', status.now_playing, snd_index, n_snds, char(this_run_data.File(snd_index))), status.start_secs, environment.log_fid);
+                write_event_2_file(status.start_secs, num2str(status.big_circle), status.curr_snd, num2str(status.n_pulses_detected), 'sound_on', environment.csv_fid);
+                sil_start = GetSecs() + 12; % 10 s sound + 2 s buffer from start
+            end % if status.last_silence
         end % if (GetSecs()
     end % if snd_status.Active
 end % while status.continue
