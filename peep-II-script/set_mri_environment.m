@@ -1,4 +1,4 @@
-function environment = set_mri_environment
+function environment = set_mri_environment()
 % environment = set_mri_environment
 %   Sets environment-level variables for PEEP-II study.
 
@@ -13,6 +13,16 @@ if exist('environment', 'var')
     clear('environment')
 end
 
+% if ~(strcmp(run_mode, 'SLEIC') || strcmp(run_mode, 'Test'))
+%     fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
+%     fprintf('Invalid run_mode: %s. Terminating.\n\n', run_mode);
+%     return;
+% else
+%     fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
+%     fprintf('Valid run_mode: %s.\n', run_mode);
+%     environment.run_mode = run_mode;
+% end
+    
 % Scan parameters
 environment.scanner = 'Siemens Prisma 3T';
 environment.center = 'PSU SLEIC, University Park, PA';
@@ -39,6 +49,8 @@ environment.tabKey = KbName('TAB');
 environment.circle_chg_min_secs = 1.5; % 1.5 s from start of sound or silence
 environment.circle_chg_max_secs = 8.5; % 1.5 s from end of sound or silence
 environment.circle_chg_dur_secs = 1;   % 1 s duration
+environment.secs_btw_presses = .15;
+environment.secs_btw_pulses = environment.mri_TR * .95; % 95% of TR
 
 % Screen & keyboard parameters
 try
@@ -57,7 +69,7 @@ try
     fprintf('%s : Detected %i input devices.\n', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'), kbds);
     for k = 1:kbds
         switch char(productNames(k))
-            case 'Apple Internal Keyboard / Trackpad'
+            case 'Apple Internal Keyboard / Trackpad'   % Internal keyboard
                 environment.internal_kbd_i = k;
                 environment.internal_kbd_index = keyboardIndices(k);
                 if length(keyboardIndices) == 1
@@ -66,18 +78,18 @@ try
                     environment.trigger_kbd_i = k;
                     environment.trigger_kbd_index = keyboardIndices(k);
                 end
-            case 'KeyWarrior8 Flex'
+            case 'KeyWarrior8 Flex'                     % Grips
                 environment.external_kbd_i = k;
                 environment.external_kbd_index = keyboardIndices(k);
-            case 'TRIGI-USB'
+            case 'TRIGI-USB'                            % Scanner trigger
                 environment.trigger_kbd_i = k;
                 environment.trigger_kbd_index = keyboardIndices(k);
-            case 'Apple Keyboard'
+            case 'Apple Keyboard'                       % External keyboard
                 environment.external_kbd_i = k;
                 environment.trigger_kbd_i = k;
                 environment.external_kbd_index = keyboardIndices(k);
                 environment.trigger_kbd_index = keyboardIndices(k);
-            case 'Dell USB Entry Keyboard'
+            case 'Dell USB Entry Keyboard'              % External keyboard
                 environment.external_kbd_i = k;
                 environment.trigger_kbd_i = k;
                 environment.external_kbd_index = keyboardIndices(k);
@@ -115,7 +127,7 @@ catch
     psychrethrow(psychlasterror);
 end
 
-% Stimulus parameters
+% Visual stimulus parameters
 environment.particip_text_color = environment.color.midblue;
 environment.particip_text_size = 50;
 environment.fix_color = environment.color.midblue;

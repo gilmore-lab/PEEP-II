@@ -1,4 +1,4 @@
-function peep_mri
+function peep_mri()
 % peep_mri
 %   Runs PEEP-II MRI protocol.
 
@@ -22,7 +22,7 @@ fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
 fprintf('This is the PEEP-II script.\n\n');
 
 % Load environment, session info
-environment = set_peep_environment();
+environment = set_mri_environment();
 fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));
 fprintf('Loaded environment.\n\n');
 
@@ -36,13 +36,13 @@ session = get_peep_session_data(session, environment);
 % Create run-specific log file
 log_fn = strcat('log/', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.log');
 [log_fid, ~] = fopen(log_fn, 'w');
-peep_log_msg('Opened log file: log_fn\n', GetSecs(), log_fid);
+peep_log_msg(sprintf('Opened log file: %s\n', log_fn), GetSecs(), log_fid);
 environment.log_fid = log_fid;
 
 % Create run-specific event file
 csv_fn = strcat('csv/', 'mri-', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
-peep_log_msg('Opened csv file: %s\n', GetSecs(), environment.log_fid);
+peep_log_msg(sprintf('Opened csv file: %s\n', csv_fn), GetSecs(), log_fid);
 fprintf(csv_fid, 'date_time,secs_from_start,vis_ring,snd_playing,mri_vol,event_type\n');
 environment.csv_fid = csv_fid;
 
