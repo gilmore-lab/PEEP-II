@@ -156,7 +156,7 @@ write_event_2_file(status.start_secs, num2str(status.big_circle), 'silence', num
 % Start sound loop
 while status.continue
     snd_status = PsychPortAudio('GetStatus', pahandle);
-    [ status ] = handle__mri_keypress(environment, status);
+    [ status ] = handle_mri_keypress(environment, status);
     if snd_status.Active
 %         switch environment.kbds
 %             case 3 % SLEIC
