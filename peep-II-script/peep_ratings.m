@@ -6,6 +6,7 @@ function peep_ratings
 % 2016-01-11 Rick O. Gilmore rick.o.gilmore@gmail.com
 
 % 2016-12-xx rog wrote
+% 2016-02-07 rog added scared faces.
 %--------------------------------------------------------------------------
 
 % Start diary
@@ -56,7 +57,7 @@ environment.log_fid = log_fid;
 csv_fn = strcat('csv/', 'rating-', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
 peep_log_msg('Opened csv file: %s\n', GetSecs(), log_fid);
-fprintf(csv_fid, 'fam_id,nov_id,run,order,sound_index,snd_file,happy_rating,angry_rating,sad_rating,how_feel,know_speaker\n');
+fprintf(csv_fid, 'fam_id,nov_id,run,order,sound_index,snd_file,happy_rating,angry_rating,sad_rating,scared_rating,how_feel,know_speaker\n');
 environment.csv_fid = csv_fid;
 
 % Collect ratings
@@ -71,6 +72,6 @@ KbStrokeWait;
 diary off;
 fclose('all');
 Screen('CloseAll');
-clc; % To clear buffer
+%clc; % To clear buffer
 end
 

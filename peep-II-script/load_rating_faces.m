@@ -16,6 +16,7 @@ function env = load_rating_faces( env )
 %   collect_ratings.m
 
 % 2015-12-29 rog added face(4) to fix bug.
+% 2015-02-07 rog added scared face
 %--------------------------------------------------------------------------
 
 % Load img files
@@ -32,6 +33,10 @@ sad2 = imread('img/sad-2.jpg');
 sad3 = imread('img/sad-3.jpg');
 sad4 = imread('img/sad-4.jpg');
 neu1 = imread('img/ang-1.jpg');
+sca1 = imread('img/sca-1.jpg');
+sca2 = imread('img/sca-2.jpg');
+sca3 = imread('img/sca-3.jpg');
+sca4 = imread('img/sca-4.jpg');
 yesImg = imread('img/yes-crop.jpg');
 noImg = imread('img/no-crop.jpg');
 
@@ -48,10 +53,15 @@ sadTex1 = Screen('MakeTexture', env.win_ptr, sad1);
 sadTex2 = Screen('MakeTexture', env.win_ptr, sad2);
 sadTex3 = Screen('MakeTexture', env.win_ptr, sad3);
 sadTex4 = Screen('MakeTexture', env.win_ptr, sad4);
+scaTex1 = Screen('MakeTexture', env.win_ptr, sca1);
+scaTex2 = Screen('MakeTexture', env.win_ptr, sca2);
+scaTex3 = Screen('MakeTexture', env.win_ptr, sca3);
+scaTex4 = Screen('MakeTexture', env.win_ptr, sca4);
 feelTex1 = Screen('MakeTexture', env.win_ptr, hap1); % neutral
 feelTex2 = Screen('MakeTexture', env.win_ptr, hap3); % mid happy
 feelTex3 = Screen('MakeTexture', env.win_ptr, ang3); % mid angry
 feelTex4 = Screen('MakeTexture', env.win_ptr, sad3); % mid sad
+feelTex5 = Screen('MakeTexture', env.win_ptr, sca3); % mid scared
 
 yesTex = Screen('MakeTexture', env.win_ptr, yesImg);
 noTex = Screen('MakeTexture', env.win_ptr, noImg);
@@ -72,10 +82,17 @@ env.face(3).intensity(2) = sadTex2;
 env.face(3).intensity(3) = sadTex3;
 env.face(3).intensity(4) = sadTex4;
 
-env.face(4).intensity(1) = feelTex1;
-env.face(4).intensity(2) = feelTex2;
-env.face(4).intensity(3) = feelTex3;
-env.face(4).intensity(4) = feelTex4;
+env.face(4).intensity(1) = scaTex1;
+env.face(4).intensity(2) = scaTex2;
+env.face(4).intensity(3) = scaTex3;
+env.face(4).intensity(4) = scaTex4;
+
+env.face(5).intensity(1) = feelTex1;
+env.face(5).intensity(2) = feelTex2;
+env.face(5).intensity(3) = feelTex3;
+env.face(5).intensity(4) = feelTex4;
+env.face(5).intensity(5) = feelTex5;
+
 env.yesImg = yesTex;
 env.noImg = noTex;
 

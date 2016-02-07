@@ -56,14 +56,14 @@ if pressed
     if firstPress(environment.enterKey) % Enter and save rating
         % Save rating
         if (status.rating_index > 0)
-            session.rating(status.snd_index, status.rating_index) = status.highlighted_index;
+            session.ratings(status.snd_index, status.rating_index) = status.highlighted_index;
             status.highlighted_index = 1; % return to default rating
         end
         if (status.rating_index + 1 > 6)
             % Load next sound, should indicate change somehow
             if (status.snd_index + 1 <= session.n_snds)
                 write_rating_data(status, session, environment);
-                fprintf('Switching to sound %i.\n', status.snd_index);
+                fprintf('Switching to sound %i.\n', status.snd_index + 1);
                 status.snd_index = status.snd_index + 1;
                 [this_snd, ~, ~] = load_peep_sound(session.this_run_data.File(status.snd_index));
                 PsychPortAudio('FillBuffer', session.pahandle, this_snd, [], 0);

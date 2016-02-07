@@ -53,7 +53,7 @@ environment = load_rating_faces(environment);
 % Load run and order data from file into cell array of filenames
 peep_log_msg(sprintf('Initializing run %s, order %s for participant %s. Unfamiliar family is %s.\n', run, order, fam, nov), GetSecs(), environment.log_fid);
 session.this_run_data = create_run_file_list(environment, session);
-session.n_snds = height(session.this_run_data);
+session.n_snds = height(session.this_run_data)-environment.drop_last_neutral;
 
 % Initialize ratings matrix
 session.ratings = zeros(session.n_snds,6); % initialize rating matrix

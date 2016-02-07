@@ -24,6 +24,9 @@ if exist('environment', 'var')
     clear('environment')
 end
 
+% For ratings, drop last neutral sound?
+environment.drop_last_neutral = 1;
+
 % Directories
 environment.root_dir = 'peep-II-ratings';
 environment.run_orders_dir = 'run-orders';
