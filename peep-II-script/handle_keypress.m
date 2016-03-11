@@ -10,6 +10,7 @@ function [ status, session ] = handle_keypress(session, environment, status)
 % 2015-12-29 rog debugged up/down arrow, left/right keypress, ESCAPE, SPACE
 % 2016-01-11 rog tweaked behavior when reaching end of sounds, writing data
 %               to file
+% 2016-03-11 rog fixed error with writing data from last rating.
 %--------------------------------------------------------------------------
 
 [pressed, ~, firstPress, ~] = KbCheck(environment.internal_kbd_index);
@@ -60,9 +61,10 @@ if pressed
             status.highlighted_index = 1; % return to default rating
         end
         if (status.rating_index + 1 > 6)
+            write_rating_data(status, session, environment);
             % Load next sound, should indicate change somehow
             if (status.snd_index + 1 <= session.n_snds)
-                write_rating_data(status, session, environment);
+                % write_rating_data(status, session, environment);
                 fprintf('Switching to sound %i.\n', status.snd_index + 1);
                 status.snd_index = status.snd_index + 1;
                 [this_snd, ~, ~] = load_peep_sound(session.this_run_data.File(status.snd_index));
