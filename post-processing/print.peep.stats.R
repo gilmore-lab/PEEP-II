@@ -38,6 +38,7 @@ print.peep.stats <- function(log.fn='mri-901-2016-03-09-1031-run-2-order-1.csv',
   cat(sprintf('%i sounds were played', dim(snd.vols)[1]),'\n\n')
   flush.console()
   snd.files <- levels(snd.vols$snd_playing)
+  
   # Take all but first, "silence"
   snd.files <- snd.files[2:length(snd.files)]
   

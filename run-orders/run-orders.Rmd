@@ -171,5 +171,7 @@ peep_filtered$Script <- as.numeric(peep_filtered$Script)
 peep_filtered$Run <- as.numeric(peep_filtered$Run)
 peep_filtered$Stim_index <- as.numeric(peep_filtered$Stim_index)
 
+# Convert script to text labels
+peep_filtered$Script <- factor(peep_filtered$Script, labels=c("din", "tlk", "chk", "hlp"))
 write.csv(peep_filtered, paste(dir_csv, 'run_orders.csv', sep='/'), row.names = FALSE)
 ```

@@ -1,7 +1,7 @@
 import.peep.log <- function(log.fn){
-  part.id <- substr(x = log.fn, start = 17, 19)
-  run <- substr(x = log.fn, start = 41, 41)
-  order <- substr(x = log.fn, start = 49, 49)
+  part.id <- substr(x = log.fn, start = 5, 7)
+  run <- substr(x = log.fn, start = 29, 29)
+  order <- substr(x = log.fn, start = 37, 37)
   
   peep <- read.csv(log.fn)
   
