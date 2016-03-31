@@ -46,13 +46,21 @@ if pressed
             else
                 status.highlighted_index = 4;
             end
-        else % for yes/no judgment
-             if (status.highlighted_index + 1 < 3)
+        end
+        if status.rating_index == 5
+                if (status.highlighted_index + 1 < 5)
+                    status.highlighted_index = status.highlighted_index + 1;
+                else
+                    status.highlighted_index = 5;
+                end
+        end
+        if (status.rating_index == 6) || (status.rating_index == 7) % for yes/no judgment
+            if (status.highlighted_index + 1 < 3)
                 status.highlighted_index = status.highlighted_index + 1;
             else
                 status.highlighted_index = 2;
             end
-        end 
+        end
     end
     if firstPress(environment.enterKey) % Enter and save rating
         % Save rating
@@ -60,7 +68,7 @@ if pressed
             session.ratings(status.snd_index, status.rating_index) = status.highlighted_index;
             status.highlighted_index = 1; % return to default rating
         end
-        if (status.rating_index + 1 > 6)
+        if (status.rating_index + 1 > 7)
             write_rating_data(status, session, environment);
             % Load next sound, should indicate change somehow
             if (status.snd_index + 1 <= session.n_snds)
@@ -80,8 +88,8 @@ if pressed
     end % if firstPress(environment.enterKey)
     if firstPress(environment.tabKey)
         fprintf('Rating index %i.\n', status.rating_index);
-        if (status.rating_index + 1 > 6)
-            status.rating_index = 6;
+        if (status.rating_index + 1 > 7)
+            status.rating_index = 7;
         else
             status.rating_index = status.rating_index + 1;
         end
@@ -98,8 +106,8 @@ if pressed
     end
     if firstPress(environment.downArrowKey) % Go forward to next rating
         fprintf('Rating index %i.\n', status.rating_index);
-        if (status.rating_index + 1 > 6)
-            status.rating_index = 6;
+        if (status.rating_index + 1 > 7)
+            status.rating_index = 7;
         else
             status.rating_index = status.rating_index + 1;
         end
