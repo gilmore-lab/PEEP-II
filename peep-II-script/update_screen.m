@@ -16,7 +16,7 @@ function update_screen(session, env, status)
 try
     Screen('FillRect', env.win_ptr, env.color.gray);
     Screen('TextFont', env.win_ptr, 'Courier New');
-    Screen('TextSize', env.win_ptr, env.particip_text_size);
+    Screen('TextSize', env.win_ptr, 0.8*env.particip_text_size);
     Screen('TextStyle', env.win_ptr, 1+2);
     msg_text = sprintf('%s / %s : Run %s : Order %s : Snd %i of %i', char(session.this_family), char(session.nov_family), char(session.run), char(session.order), status.snd_index, session.n_snds);
     DrawFormattedText(env.win_ptr, msg_text, 'center', 0, env.particip_text_color);
@@ -29,7 +29,7 @@ end
 % Instructions to experimenter
 try
     Screen('TextFont', env.win_ptr, 'Courier New');
-    Screen('TextSize', env.win_ptr, round(0.5*env.particip_text_size)); % 50% smaller?
+    Screen('TextSize', env.win_ptr, round(0.38*env.particip_text_size)); % 50% smaller?
     Screen('TextStyle', env.win_ptr, 1+2);
     msg_text = sprintf('SPACE to start sound; Left/Right switch between rating values; Up/Down switch questions; Return to record rating');
     DrawFormattedText(env.win_ptr, msg_text, 'center', 100, env.color.midred);
@@ -135,15 +135,15 @@ switch status.rating_index
     case 0
         msg_text = 'Press SPACE to listen to the sound.';
     case 1
-        msg_text = 'How HAPPY does this make you feel?';
+        msg_text = 'How HAPPY does this sound?';
     case 2
-        msg_text = 'How ANGRY does this make you feel?';
+        msg_text = 'How ANGRY does this sound?';
     case 3
-        msg_text = 'How SAD does this make you feel?';
+        msg_text = 'How SAD does this sound?';
     case 4
-        msg_text = 'How SCARED does this make you feel?';
+        msg_text = 'How SCARED does this sound?';
     case 5
-        msg_text = 'How did this make you feel?';
+        msg_text = 'How does this make you feel?';
     case 6
         msg_text = 'Do you know who is speaking?';
     case 7
@@ -154,7 +154,7 @@ end
 Screen('TextFont', env.win_ptr, 'Courier New');
 Screen('TextSize', env.win_ptr, round(env.particip_text_size));
 Screen('TextStyle', env.win_ptr, 1);
-DrawFormattedText(env.win_ptr, msg_text, 'center', face_msg_y, env.particip_text_color);
+DrawFormattedText(env.win_ptr, msg_text, 'center', 200, face_msg_y, env.particip_text_color);
 
 % Flip to write
 Screen('Flip', env.win_ptr);

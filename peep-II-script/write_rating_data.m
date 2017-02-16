@@ -5,7 +5,6 @@ function write_rating_data(status, session, env)
 % 2016-01-11 Rick O. Gilmore rick.o.gilmore@gmail.com
 
 % 2016-01-11 rog wrote.
-% 2016-02-07 rog added scared rating.
 %--------------------------------------------------------------------------
 
 % Write fam, nov, run, order, snd_index, snd_file name

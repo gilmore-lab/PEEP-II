@@ -17,6 +17,8 @@ try
     if nrchannels < 2
         this_snd = [this_snd' ; this_snd'];
         nrchannels = 2;
+    else
+        this_snd = this_snd';
     end
 catch
     fprintf('%s : ', datestr(now, 'yyyy-mm-dd-HH:MM:SS.FFF'));

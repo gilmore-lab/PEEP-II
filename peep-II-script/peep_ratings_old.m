@@ -56,7 +56,7 @@ environment.log_fid = log_fid;
 csv_fn = strcat('csv/', 'rating-', session.this_family, '-', datestr(now, 'yyyy-mm-dd-HHMM'), '-run-', session.run, '-order-', session.order, '.csv');
 [csv_fid, ~] = fopen(csv_fn, 'w');
 peep_log_msg('Opened csv file: %s\n', GetSecs(), log_fid);
-fprintf(csv_fid, 'fam_id,nov_id,run,order,sound_index,snd_file,happy_rating,angry_rating,sad_rating,scared-rating,how_feel,know_speaker\n');
+fprintf(csv_fid, 'fam_id,nov_id,run,order,sound_index,snd_file,happy_rating,angry_rating,sad_rating,how_feel,know_speaker\n');
 environment.csv_fid = csv_fid;
 
 % Collect ratings

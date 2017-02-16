@@ -49,8 +49,8 @@ environment.tabKey = KbName('TAB');
 environment.circle_chg_min_secs = 1.5; % 1.5 s from start of sound or silence
 environment.circle_chg_max_secs = 8.5; % 1.5 s from end of sound or silence
 environment.circle_chg_dur_secs = 1;   % 1 s duration
-environment.secs_btw_presses = .15;
-environment.secs_btw_pulses = environment.mri_TR * .95; % 95% of TR
+environment.secs_btw_presses = .50;
+environment.secs_btw_pulses = environment.mri_TR * .90; % 95% of TR
 
 % messages
 environment.now_playing_msgs = {'Sil', 'Snd'};
@@ -100,32 +100,21 @@ try
         end
     end
     
-%     environment.kbds = kbds;
-%     keysOfInterest=zeros(kbds,256); % make kbds x 256 array, then index
-%     
-%     % internal keyboard
-%     keysOfInterest(1, KbName('ESCAPE'))=1; % internal
-%     keysOfInterest(1, KbName('t'))=1; % trigger
-%     
-%     % external keyboard or grips
-%     keysOfInterest(2, KbName('a'))=1;
-%     keysOfInterest(2, KbName('b'))=1;
-%     keysOfInterest(2, KbName('c'))=1;
-%     keysOfInterest(2, KbName('d'))=1;
-%     
-%     % trigger
-%     keysOfInterest(3, KbName('t'))=1;
-    
-    keysOfInterest=zeros(256); % make kbds x 256 array, then index
+    environment.kbds = kbds;
+    keysOfInterest=zeros(kbds,256); % make kbds x 256 array, then index
     
     % internal keyboard
-    keysOfInterest(KbName('ESCAPE'))=1;
-    keysOfInterest(KbName('t'))=1;
-    keysOfInterest(KbName('a'))=1;
-    keysOfInterest(KbName('b'))=1;
-    keysOfInterest(KbName('c'))=1;
-    keysOfInterest(KbName('d'))=1;
-    keysOfInterest(KbName('Tab'))=1;
+    keysOfInterest(1, KbName('ESCAPE'))=1; % internal
+    keysOfInterest(1, KbName('t'))=1; % trigger
+    
+    % external keyboard or grips
+    keysOfInterest(2, KbName('a'))=1;
+    keysOfInterest(2, KbName('b'))=1;
+    keysOfInterest(2, KbName('c'))=1;
+    keysOfInterest(2, KbName('d'))=1;
+    
+    % trigger
+    keysOfInterest(3, KbName('t'))=1;
     
     environment.keysOfInterest = keysOfInterest;
     environment.productNames = productNames;

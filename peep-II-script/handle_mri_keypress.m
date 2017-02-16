@@ -1,5 +1,5 @@
 function [ status ] = handle_mri_keypress(environment, status)
-% handle__mri_keypress(environment, status)
+% handle__mri_keypress(session, environment, status)
 %   handles keypresses from peep_mri set of scripts
 
 % 2015-01-15 Rick Gilmore, rick.o.gilmore@gmail.com
@@ -14,11 +14,10 @@ function [ status ] = handle_mri_keypress(environment, status)
 %       peep_run.m
 
 % 2015-01-15 rog created
-% 2015-01-21 rog added keysOfInterest to KbCheck.
 %--------------------------------------------------------------------------
 
 % Check keyboard(s) then handle
-[pressed, timeSecs, firstPress, ~] = KbCheck(environment.keyboardIndices, environment.keysOfInterest);
+[pressed, timeSecs, firstPress, ~] = KbCheck(environment.keyboardIndices);
 if pressed
     if firstPress(environment.escapeKey) % Escape
         peep_log_msg(sprintf('%s : Escape detected at %07.3f from start.\n', status.now_playing, timeSecs-status.start_secs), status.start_secs, environment.log_fid);

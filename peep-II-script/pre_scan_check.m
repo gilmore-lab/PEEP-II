@@ -24,8 +24,8 @@ function pre_scan_check(fam_id, nov_id)
 %--------------------------------------------------------------------------
 
 if nargin < 1
-    fam_id = '9999';
-    nov_id = '9998';
+    fam_id = '012';
+    nov_id = '012';
     fprintf('Familiar and novel IDs not specified. Using defaults: fam %s, nov %s.\n', fam_id, nov_id);
 else
     if ~ischar(fam_id)
